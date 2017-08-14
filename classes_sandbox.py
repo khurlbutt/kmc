@@ -1,5 +1,3 @@
-import itertools
-
 
 class Lattice(object):
 
@@ -12,7 +10,7 @@ class Lattice(object):
     def enumerate_cells(self):
         # Example of a generator-iterator as described by PEP 255.
         # Intro to generators as "lazy evaluation" or "calculation on demand":
-        #     http://intermediatepythonista.com/python-generators
+        #   http://intermediatepythonista.com/python-generators
         for row in range(self.length):
             for col in range(self.width):
                 yield self.cells[row][col]
@@ -31,6 +29,7 @@ class Lattice(object):
                 species.add(cell.adsorbate)
         return "(%d,%d)[%d occupied]{%d species: %r}" % (
             self.length, self.width, self.num_occupied(), len(species), species)
+
 
 class Cell(object):
 
@@ -52,12 +51,11 @@ class Process(object):
         pass
 
 
-
-
 class EnabledCollection(object):
 
     def __init__(self):
         pass
+
 
 def main():
     lattice = Lattice(length=2, width=2)
