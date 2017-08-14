@@ -3,11 +3,11 @@ import itertools
 
 class Lattice(object):
 
-    def __init__(self, width=2, length=2):
-        self.width = width
+    def __init__(self, length=2, width=2):
         self.length = length
-        self.cells = [[Cell(i, j) for i in range(self.width)]
-            for j in range(self.length)]
+        self.width = width
+        self.cells = [[Cell(row, col) for col in range(self.width)]
+            for row in range(self.length)]
 
 class Cell(object):
 
