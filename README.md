@@ -1,8 +1,8 @@
 # kmc
 Kinetic Monte Carlo Simulation
 
-- Setup
-Uses python 3.5.2 and pip.
+## Setup
+Requires python 3.5.2 and pip.
 
 Simply run the following
 * pip install -r requirements.txt
