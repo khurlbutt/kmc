@@ -60,17 +60,66 @@ class Cell(object):
 
 class Process(object):
 
-    def __init__(self):
-        pass
+    def __init__(self, sim_time, cell, is_enabled_still_fn, perform_fn):
+        # From what I can tell a simple model might use 4 inputs:
+        # sim_time : estimated time(step) of occurence
+        # cell : lattice cell in question
+        # is_enabled_still_fn : method to know if process still "allowed" after
+        #                       considering lattice changes since entry into
+        #                       EnabledCollection, i.e. a "null event" check
+        # perform_fn : method for performing what process would do if enacted
+        self.sim_time = sim_time
+        # TODO: Only cell indices
+        self.cell = cell
+        # TODO: Only 2-tuple, e.g. index of function template, cell indices
+        self._is_enabled_still_fn = is_enabled_still_fn
+        # TODO: Only 2-tuple, e.g. index of function template, cell indices
+        self._perform_fn = perform_fn
+        self._is_performed = False
+
+    def perform(self):
+        if not self.is_still_performable():
+            raise LatticeProcessException("Not performable")
+        self._perform_fn(self.cell)
+        self._is_performed = True
+
+    def is_still_performable(self):
+        # Assumes that references to cell sites updated elsewhere. Eventually,
+        # may need to reference neighbors using cell.row or cell.col.
+        return not self._is_performed and self._is_enabled_still_fn(self.cell)
+
+    def is_performed(self):
+        return bool(self._is_performed)
+
+    def __repr__(self):
+        return "%r" % [
+            self.sim_time,
+            (self.cell.row, self.cell.col),
+            ("is_performed", self.is_performed()),
+            ("_is_enabled_still_fn", self._is_enabled_still_fn),
+            ("_perform_fn", self._perform_fn)]
 
 
 class EnabledCollection(object):
 
     def __init__(self):
+        # Requirements:
+        # Add element, log n
+        # Pop lowest value (for sim_time), log n
+        #
+        # Nice to have:
+        #
+        # Current top ideas:
+        # Red-black tree
+        #
         pass
 
 
 class CellException(Exception):
+    pass
+
+
+class LatticeProcessException(Exception):
     pass
 
 
@@ -101,8 +150,54 @@ def print_toy_lattice_examples():
             print(cell)
 
 
+def print_toy_process_examples():
+    for num_sites in range(1, 6):
+        lattice = Lattice(length=2, width=2, num_sites=num_sites)
+        process = None
+        if num_sites == 1:
+            def _still_allowed_fn(cell):
+                return cell.get_adsorbates() == ["A"]
+
+            def _perform_fn(cell):
+                cell.sites = ["*_0"]
+            cell = lattice.cells[0][0]
+            cell.sites = ["A"]
+            sim_time = 10  # Whatever
+            remove = Process(sim_time, cell, _still_allowed_fn, _perform_fn)
+            process = remove
+            print("\n\nREMOVAL: %d site(s) per cell" % num_sites)
+        if num_sites == 5:
+            def _still_allowed_fn(cell):
+                return bool(
+                    cell.sites[0] == "*_0" and
+                    cell.sites[1] == "*_1" and
+                    cell.sites[2] == "CO2" and
+                    cell.sites[3] == "CO2" and
+                    cell.sites[4] == "*_4")
+
+            def _perform_fn(cell):
+                cell.sites = ["CO", "CO", "*_2", "*_4", "O2"]
+            cell = lattice.cells[0][0]
+            cell.sites = ["*_0", "*_1", "CO2", "CO2", "*_4"]
+            sim_time = 10  # Whatever
+            breakdown = Process(sim_time, cell, _still_allowed_fn, _perform_fn)
+            process = breakdown
+            print("\n\nBREAKDOWN: %d site(s) per cell" % num_sites)
+        if process:
+            print("before")
+            print("Lattice:%r" % lattice)
+            print("Process:%r" % process)
+            print(process.cell)
+            process.perform()
+            print("after")
+            print("Lattice:%r" % lattice)
+            print("Process:%r" % process)
+            print(process.cell)
+
+
 def main():
     print_toy_lattice_examples()
+    print_toy_process_examples()
 
 
 if __name__ == '__main__':
