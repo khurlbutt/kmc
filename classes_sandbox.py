@@ -1,11 +1,11 @@
 
 class Lattice(object):
 
-    def __init__(self, length=2, width=2):
-        self.length = length
-        self.width = width
-        self.cells = [[Cell(row, col) for col in range(self.width)]
-            for row in range(self.length)]
+    def __init__(self, length=None, width=None, sites_per_cell=None):
+        self.length = length or 2
+        self.width = width or 2
+        self.cells = [[Cell(row, col, sites_per_cell=sites_per_cell or 1)
+            for col in range(self.width)] for row in range(self.length)]
 
     def enumerate_cells(self):
         # Example of a generator-iterator as described by PEP 255.
@@ -15,34 +15,47 @@ class Lattice(object):
             for col in range(self.width):
                 yield self.cells[row][col]
 
-    def num_occupied(self):
-        num_occupied = 0
-        for cell in self.enumerate_cells():
-            if cell.is_occupied():
-                num_occupied += 1
-        return num_occupied
-
     def __repr__(self):
-        species = set()
+        species_counts = {}
         for cell in self.enumerate_cells():
-            if cell.adsorbate:
-                species.add(cell.adsorbate)
-        return "(%d,%d)[%d occupied]{%d species: %r}" % (
-            self.length, self.width, self.num_occupied(), len(species), species)
+            for adsorbate in cell.get_adsorbates():
+                species_counts[adsorbate] = species_counts.get(adsorbate, 0) + 1
+        dist = {}
+        # Does not assume holes, but include holes if present.
+        total_count = sum([adsorbate_count
+            for species, adsorbate_count in species_counts.items()])
+        for species, adsorbate_count in species_counts.items():
+            dist[species] = adsorbate_count / total_count
+        sorted_distribution = ["%s:%.2f" % (s, p) for s, p in sorted(
+            dist.items(), key=lambda item: item[1], reverse=True)]
+        return "(%d,%d){%r unique species: %r}" % (self.length, self.width,
+            len(species_counts), sorted_distribution)
 
 
 class Cell(object):
 
-    def __init__(self, row, col, adsorbate=None):
+    def __init__(self, row, col, sites_per_cell=None, sites=None):
+
+        # User-defined indices map to a particular model.
+        # TODO: Okay to assume empty sites are occupied by a hole of some kind?
+        def _initialize_sites(sites_per_cell, sites=None):
+            if not sites_per_cell and not sites:
+                raise CellException("Uninitialized sites")
+            if sites and len(sites) == sites_per_cell:
+                return sites
+            return ["*_%d" % index for index in range(sites_per_cell)]
+
         self.row = row
         self.col = col
-        self.adsorbate = adsorbate
+        self.sites = _initialize_sites(sites_per_cell or 0, sites=sites)
 
-    def is_occupied(self):
-        return bool(self.adsorbate)
+    # TODO: Okay to assume empty sites are occupied by a hole of some kind?
+    def get_adsorbates(self):
+        return [adsorbate if adsorbate else "*_%d" % index
+            for index, adsorbate in enumerate(self.sites)]
 
     def __repr__(self):
-        return "(%d,%d)[%r]" % (self.row, self.col, self.adsorbate)
+        return "(%d,%d)%r" % (self.row, self.col, self.sites)
 
 
 class Process(object):
@@ -57,12 +70,39 @@ class EnabledCollection(object):
         pass
 
 
+class CellException(Exception):
+    pass
+
+
+def print_toy_lattice_examples():
+    for sites_per_cell in range(1, 5):
+        print("\n\n%d site(s) per cell:" %
+            sites_per_cell)
+        lattice = Lattice(length=2, width=2, sites_per_cell=sites_per_cell)
+        if sites_per_cell == 1:
+            lattice.cells[0][0].sites = ["A"]
+        elif sites_per_cell == 2:
+            lattice.cells[0][0].sites = ["O2", "CO"]
+            lattice.cells[0][1].sites = ["*_0", "CO"]
+            lattice.cells[1][0].sites = ["O2", "*_1"]
+        elif sites_per_cell == 3:
+            lattice.cells[0][0].sites = ["X_bridge", "Y_bridge", "*_2"]
+            lattice.cells[0][1].sites = ["*_0", "*_1", "Z_hollow"]
+            lattice.cells[1][0].sites = ["X_bridge", "*_1", "Z_hollow"]
+            lattice.cells[1][1].sites = ["*_0", "Y_bridge", "Z_hollow"]
+        else:
+            # Exists a dist of "allowed" occupants, dependpent on cell's state.
+            example_sites = ["<draw_allowable(cell, site_%d)>" % index
+                for index in range(sites_per_cell)]
+            lattice.cells[0][0].sites = example_sites
+
+        print("Lattice: %r" % lattice)
+        for cell in lattice.enumerate_cells():
+            print(cell)
+
+
 def main():
-    lattice = Lattice(length=2, width=2)
-    lattice.cells[0][0].adsorbate = "A"
-    print("Lattice: %r" % lattice)
-    for cell in lattice.enumerate_cells():
-        print(cell)
+    print_toy_lattice_examples()
 
 
 if __name__ == '__main__':
