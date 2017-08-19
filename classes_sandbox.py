@@ -1,10 +1,10 @@
 
 class Lattice(object):
 
-    def __init__(self, length=None, width=None, sites_per_cell=None):
+    def __init__(self, length=None, width=None, num_sites=None):
         self.length = length or 2
         self.width = width or 2
-        self.cells = [[Cell(row, col, sites_per_cell=sites_per_cell or 1)
+        self.cells = [[Cell(row, col, num_sites=num_sites or 1)
             for col in range(self.width)] for row in range(self.length)]
 
     def enumerate_cells(self):
@@ -26,7 +26,7 @@ class Lattice(object):
             for species, adsorbate_count in species_counts.items()])
         for species, adsorbate_count in species_counts.items():
             dist[species] = adsorbate_count / total_count
-        sorted_distribution = ["%s:%.2f" % (s, p) for s, p in sorted(
+        sorted_distribution = [(s, "%.2f" % p) for s, p in sorted(
             dist.items(), key=lambda item: item[1], reverse=True)]
         return "(%d,%d){%r unique species: %r}" % (self.length, self.width,
             len(species_counts), sorted_distribution)
@@ -34,20 +34,20 @@ class Lattice(object):
 
 class Cell(object):
 
-    def __init__(self, row, col, sites_per_cell=None, sites=None):
+    def __init__(self, row, col, num_sites=None, sites=None):
 
         # User-defined indices map to a particular model.
         # TODO: Okay to assume empty sites are occupied by a hole of some kind?
-        def _initialize_sites(sites_per_cell, sites=None):
-            if not sites_per_cell and not sites:
+        def _initialize_sites(num_sites, sites=None):
+            if not num_sites and not sites:
                 raise CellException("Uninitialized sites")
-            if sites and len(sites) == sites_per_cell:
+            if sites and len(sites) == num_sites:
                 return sites
-            return ["*_%d" % index for index in range(sites_per_cell)]
+            return ["*_%d" % index for index in range(num_sites)]
 
         self.row = row
         self.col = col
-        self.sites = _initialize_sites(sites_per_cell or 0, sites=sites)
+        self.sites = _initialize_sites(num_sites or 0, sites=sites)
 
     # TODO: Okay to assume empty sites are occupied by a hole of some kind?
     def get_adsorbates(self):
@@ -75,17 +75,17 @@ class CellException(Exception):
 
 
 def print_toy_lattice_examples():
-    for sites_per_cell in range(1, 5):
+    for num_sites in range(1, 5):
         print("\n\n%d site(s) per cell:" %
-            sites_per_cell)
-        lattice = Lattice(length=2, width=2, sites_per_cell=sites_per_cell)
-        if sites_per_cell == 1:
+            num_sites)
+        lattice = Lattice(length=2, width=2, num_sites=num_sites)
+        if num_sites == 1:
             lattice.cells[0][0].sites = ["A"]
-        elif sites_per_cell == 2:
+        elif num_sites == 2:
             lattice.cells[0][0].sites = ["O2", "CO"]
             lattice.cells[0][1].sites = ["*_0", "CO"]
             lattice.cells[1][0].sites = ["O2", "*_1"]
-        elif sites_per_cell == 3:
+        elif num_sites == 3:
             lattice.cells[0][0].sites = ["X_bridge", "Y_bridge", "*_2"]
             lattice.cells[0][1].sites = ["*_0", "*_1", "Z_hollow"]
             lattice.cells[1][0].sites = ["X_bridge", "*_1", "Z_hollow"]
@@ -93,7 +93,7 @@ def print_toy_lattice_examples():
         else:
             # Exists a dist of "allowed" occupants, dependpent on cell's state.
             example_sites = ["<draw_allowable(cell, site_%d)>" % index
-                for index in range(sites_per_cell)]
+                for index in range(num_sites)]
             lattice.cells[0][0].sites = example_sites
 
         print("Lattice: %r" % lattice)
