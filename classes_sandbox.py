@@ -72,6 +72,9 @@ class Process(object):
         # TODO: Only cell indices
         self.cell = cell
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
+        # TODO: This must invalidate processes involving sites updated since
+        #       process sim_time to avoid oversampling expired processes that
+        #       otherwise meet enablement criteria.
         self._is_enabled_still_fn = is_enabled_still_fn
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
         self._perform_fn = perform_fn
