@@ -168,12 +168,14 @@ def print_toy_process_examples():
             print("\n\nREMOVAL: %d site(s) per cell" % num_sites)
         if num_sites == 5:
             def _still_allowed_fn(cell):
-                return bool(
-                    cell.sites[0] == "*_0" and
-                    cell.sites[1] == "*_1" and
-                    cell.sites[2] == "CO2" and
-                    cell.sites[3] == "CO2" and
-                    cell.sites[4] == "*_4")
+                # We could check individual site or use patterns etc.
+                # return bool(
+                #     cell.sites[0] == "*_0" and
+                #     cell.sites[1] == "*_1" and
+                #     cell.sites[2] == "CO2" and
+                #     cell.sites[3] == "CO2" and
+                #     cell.sites[4] == "*_4")
+                return cell.sites == ["*_0", "*_1", "CO2", "CO2", "*_4"]
 
             def _perform_fn(cell):
                 cell.sites = ["CO", "CO", "*_2", "*_4", "O2"]
