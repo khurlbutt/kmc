@@ -1,4 +1,15 @@
 
+class Simulation(object):
+
+    def __init__(self):
+        self.lattice = Lattice()
+        self.potential_steps = EnabledCollection()
+        self.time = 0  # Let's try staying integer/usec, can discuss options.
+        # Enable processes
+        # Draw a process, perform if possible, add new enabled processes.
+        # (Repeat above)
+
+
 class Lattice(object):
 
     def __init__(self, length=None, width=None, num_sites=None):
