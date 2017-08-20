@@ -9,6 +9,10 @@ class Simulation(object):
         # Draw a process, perform if possible, add new enabled processes.
         # (Repeat above)
 
+    def __repr__(self):
+        return "t=%d\nLattice:%r\nEnabledCollection:%r" % (
+            self.time, self.lattice, self.potential_steps)
+
 
 class Lattice(object):
 
@@ -141,6 +145,7 @@ def main():
     import print_toys
     print_toys.lattice_examples()
     print_toys.process_examples()
+    print_toys.simulation_examples()
 
 
 if __name__ == '__main__':
