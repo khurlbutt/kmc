@@ -60,21 +60,21 @@ class Cell(object):
 
 class Process(object):
 
-    def __init__(self, sim_time, cell, is_enabled_still_fn, perform_fn):
+    def __init__(self, est_perform_time, cell, is_enabled_still_fn, perform_fn):
         # From what I can tell a simple model might use 4 inputs:
-        # sim_time : estimated time(step) of occurence
+        # est_perform_time : estimated time(step) of occurence
         # cell : lattice cell in question
         # is_enabled_still_fn : method to know if process still "allowed" after
         #                       considering lattice changes since entry into
         #                       EnabledCollection, i.e. a "null event" check
         # perform_fn : method for performing what process would do if enacted
-        self.sim_time = sim_time
+        self.est_perform_time = est_perform_time
         # TODO: Only cell indices
         self.cell = cell
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
         # TODO: This must invalidate processes involving sites updated since
-        #       process sim_time to avoid oversampling expired processes that
-        #       otherwise meet enablement criteria.
+        #       process est_perform_time to avoid oversampling expired processes
+        #       that otherwise meet enablement criteria.
         self._is_enabled_still_fn = is_enabled_still_fn
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
         self._perform_fn = perform_fn
@@ -96,7 +96,7 @@ class Process(object):
 
     def __repr__(self):
         return "%r" % [
-            self.sim_time,
+            self.est_perform_time,
             (self.cell.row, self.cell.col),
             ("is_performed", self.is_performed()),
             ("_is_enabled_still_fn", self._is_enabled_still_fn),
@@ -108,7 +108,7 @@ class EnabledCollection(object):
     def __init__(self):
         # Requirements:
         # Add element, log n
-        # Pop lowest value (for sim_time), log n
+        # Pop lowest value (for est_perform_time), log n
         #
         # Nice to have:
         #
