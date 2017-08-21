@@ -24,32 +24,32 @@ def process_examples():
             process = remove
             print("\n\n%d site(s) per cell: Removal of A" % num_sites)
         if num_sites == 2:
-            remove = _populate_dummy_process(lattice, num_sites)
-            process = remove
-            print("\n\n%d site(s) per cell: Introduce O2 of A" % num_sites)
+            introduce = _populate_dummy_process(lattice, num_sites)
+            process = introduce
+            print("\n\n%d site(s) per cell: Introduce O2" % num_sites)
         if num_sites == 3:
-            remove = _populate_dummy_process(lattice, num_sites)
-            process = remove
-            print("\n\n%d site(s) per cell: Bridge,Bridge,Hollow_(X,Y,Z)" %
-                num_sites)
+            swap_bridge = _populate_dummy_process(lattice, num_sites)
+            process = swap_bridge
+            print("\n\n%d site(s) per cell: "
+                "SwapBridge-(bridge,bridge,hollow)(XYZ)" % num_sites)
         if num_sites == 4:
             clear_random = _populate_dummy_process(lattice, num_sites)
             process = clear_random
-            print("\n\n%d site(s) per cell: ClearRandom" % num_sites)
+            print("\n\n%d site(s) per cell: RandomFill" % num_sites)
         if num_sites == 5:
             breakdown = _populate_dummy_process(lattice, num_sites)
             process = breakdown
             print("\n\n%d site(s) per cell: Breakdown of CO2" % num_sites)
         if process:
             print("before...")
+            print("\t%r" % process.cell)
             print("\tLattice:\n\t%r" % lattice)
             print("\tProcess:\n\t%r" % process)
-            print(process.cell)
             process.perform()
             print("\nafter...")
+            print("\t%r" % process.cell)
             print("\tLattice:\n\t%r" % lattice)
             print("\tProcess:\n\t%r" % process)
-            print(process.cell)
 
 
 def simulation_examples():
@@ -117,10 +117,11 @@ def _populate_dummy_process(lattice, num_sites):
             possible_changes[hole_for_index] = species
             starting_sites.append(hole_for_index)
             ending_sites.append(species)
-        toy_cell = lattice.cells[0][0]
+        toy_cell = lattice.cells[0][1]
         assert toy_cell.sites == starting_sites
     for starting_site, ending_site in zip(starting_sites, ending_sites):
-        assert ending_site in possible_changes[starting_site]
+        valid_site_change = ending_site in possible_changes[starting_site]
+        assert (starting_site == ending_site) or valid_site_change
 
     def is_enabled_still_fn(cell):
         # TODO: Quite naive, need to check whether sites have updated since time
@@ -166,6 +167,5 @@ def _populate_dummy_lattice(num_sites):
         # Exists a dist of "allowed" occupants, dependpent on cell's state.
         example_sites = ["<draw_allowable(cell, site_%d)>" % index
             for index in range(num_sites)]
-        lattice.cells[0][1].sites = example_sites
-        lattice.cells[1][1].sites = example_sites
+        lattice.cells[0][0].sites = example_sites
     return lattice
