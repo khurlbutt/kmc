@@ -20,51 +20,112 @@ def process_examples():
         lattice = _populate_dummy_lattice(num_sites)
         process = None
         if num_sites == 1:
-            def _still_allowed_fn(cell):
-                return cell.sites == ["A"]
-
-            def _perform_fn(cell):
-                cell.sites = ["*_0"]
-            sim_time = 10  # Whatever
-            toy_cell = lattice.cells[0][0]
-            remove = Process(sim_time, toy_cell, _still_allowed_fn, _perform_fn)
+            remove = _populate_dummy_process(lattice, num_sites)
             process = remove
-            print("\n\nREMOVAL: %d site(s) per cell" % num_sites)
+            print("\n\n%d site(s) per cell: Removal of A" % num_sites)
         if num_sites == 5:
-            def _still_allowed_fn(cell):
-                # We could check individual site or use patterns etc.
-                # return bool(
-                #     cell.sites[0] == "*_0" and
-                #     cell.sites[1] == "*_1" and
-                #     cell.sites[2] == "CO2" and
-                #     cell.sites[3] == "CO2" and
-                #     cell.sites[4] == "*_4")
-                return cell.sites == ["*_0", "*_1", "CO2", "CO2", "*_4"]
-
-            def _perform_fn(cell):
-                cell.sites = ["CO", "CO", "*_2", "*_4", "O2"]
-            toy_cell = lattice.cells[0][0]
-            toy_cell.sites = ["*_0", "*_1", "CO2", "CO2", "*_4"]
-            sim_time = 10  # Whatever
-            breakdown = Process(
-                sim_time, toy_cell, _still_allowed_fn, _perform_fn)
+            breakdown = _populate_dummy_process(lattice, num_sites)
             process = breakdown
-            print("\n\nBREAKDOWN: %d site(s) per cell" % num_sites)
+            print("\n\n%d site(s) per cell: Breakdown of CO2" % num_sites)
         if process:
-            print("before")
-            print("Lattice:%r" % lattice)
-            print("Process:%r" % process)
+            print("before...")
+            print("\tLattice:\n\t%r" % lattice)
+            print("\tProcess:\n\t%r" % process)
             print(process.cell)
             process.perform()
-            print("after")
-            print("Lattice:%r" % lattice)
-            print("Process:%r" % process)
+            print("\nafter...")
+            print("\tLattice:\n\t%r" % lattice)
+            print("\tProcess:\n\t%r" % process)
             print(process.cell)
 
 
 def simulation_examples():
     simulation = Simulation()
     print("\n\n%r" % simulation)
+
+
+def _populate_dummy_process(lattice, num_sites):
+    possible_changes = {}
+    if num_sites == 1:
+        starting_sites = ["A"]
+        ending_sites = ["*_0"]
+        toy_cell = lattice.cells[0][0]
+        assert toy_cell.sites == starting_sites
+        possible_changes.update({
+            "*_0": ["A"],
+            "A": ["*_0"],
+        })
+    elif num_sites == 2:
+        starting_sites = ["*_0", "CO"]
+        ending_sites = ["O2", "CO"]
+        toy_cell = lattice.cells[0][1]
+        assert toy_cell.sites == starting_sites
+        possible_changes.update({
+            "*_0": ["O2"],
+            "*_1": ["CO"],
+            "O2": ["*_0"],
+            "CO": ["*_1"],
+        })
+    elif num_sites == 3:
+        starting_sites = ["X_bridge", "*_1", "Z_hollow"]
+        ending_sites = ["*_0", "Y_bridge", "Z_hollow"]
+        toy_cell = lattice.cells[1][0]
+        assert toy_cell.sites == starting_sites
+        possible_changes.update({
+            "*_0": ["X_bridge"],
+            "*_1": ["Y_bridge"],
+            "*_2": ["Z_hollow"],
+            "X_bridge": ["*_0"],
+            "Y_bridge": ["*_1"],
+            "Z_hollow": ["*_2"],
+        })
+    elif num_sites == 5:
+        starting_sites = ["*_0", "*_1", "CO2", "CO2", "*_4"]
+        ending_sites = ["CO", "CO", "*_2", "*_3", "O2"]
+        toy_cell = lattice.cells[0][1]
+        assert toy_cell.sites == starting_sites
+        possible_changes.update({
+            "*_0": ["CO"],
+            "*_1": ["CO"],
+            "*_2": ["CO2"],
+            "*_3": ["CO2"],
+            "*_4": ["O2"],
+            "CO": ["*_0", "*_1"],
+            "CO2": ["*_2", "*_3"],
+            "O2": ["*_4"],
+        })
+    else:
+        starting_sites = []
+        ending_sites = []
+        for index in range(num_sites):
+            hole_for_index = "*_%d" % index
+            species = "<draw_allowable(cell, site_%d)>" % index
+            possible_changes[species] = hole_for_index
+            possible_changes[hole_for_index] = species
+            starting_sites.append(hole_for_index)
+            ending_sites.append(species)
+    for starting_site, ending_site in zip(starting_sites, ending_sites):
+        assert ending_site in possible_changes[starting_site]
+
+    def is_enabled_still_fn(cell):
+        # TODO: Quite naive, need to check whether sites have updated since time
+        #       when process became enabled.
+        if len(cell.sites) in range(K_MAX_TOY_DUMMY_SITES):
+            # Type tuple is immuatable; create a copy.
+            if tuple(cell.sites) == tuple(starting_sites):
+                return True
+        else:
+            assert False, "No possible case to return True."
+        return False
+
+    def perform_fn(cell):
+        # TODO: Quite naive, need to update site update times to avoid
+        #       performing expired processes at a later point.
+        # Type list is mutable, but this creates a copy for us... maybe too much
+        cell.sites = list(ending_sites)
+
+    sim_time = 10  # Whatever for now.
+    return Process(sim_time, toy_cell, is_enabled_still_fn, perform_fn)
 
 
 def _populate_dummy_lattice(num_sites):
@@ -83,8 +144,8 @@ def _populate_dummy_lattice(num_sites):
     elif num_sites == 5:
         lattice.cells[0][0].sites = ["*_0", "*_1", "*_2", "*_3", "*_4"]
         lattice.cells[0][1].sites = ["*_0", "*_1", "CO2", "CO2", "*_4"]
-        lattice.cells[1][0].sites = ["CO", "CO", "*_2", "*_4", "O2"]
-        lattice.cells[1][1].sites = ["CO", "CO", "*_2", "*_4", "O2"]
+        lattice.cells[1][0].sites = ["CO", "CO", "*_2", "*_3", "O2"]
+        lattice.cells[1][1].sites = ["CO", "CO", "*_2", "*_3", "O2"]
 
     else:
         # Exists a dist of "allowed" occupants, dependpent on cell's state.
