@@ -43,7 +43,7 @@ class Lattice(object):
             dist[species] = count / total_count
         sorted_distribution = [(s, "%.2f" % p) for s, p in sorted(
             dist.items(), key=lambda item: item[1], reverse=True)]
-        return "(%d,%d){%r unique species: %r}" % (self.length, self.width,
+        return "(%dx%d){%r unique species: %r}" % (self.length, self.width,
             len(species_counts), sorted_distribution)
 
 
