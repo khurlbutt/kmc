@@ -21,7 +21,7 @@ def process_examples():
         process = None
         if num_sites == 1:
             def _still_allowed_fn(cell):
-                return cell.get_adsorbates() == ["A"]
+                return cell.sites == ["A"]
 
             def _perform_fn(cell):
                 cell.sites = ["*_0"]

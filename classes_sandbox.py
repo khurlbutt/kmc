@@ -33,14 +33,14 @@ class Lattice(object):
     def __repr__(self):
         species_counts = {}
         for cell in self.enumerate_cells():
-            for adsorbate in cell.get_adsorbates():
-                species_counts[adsorbate] = species_counts.get(adsorbate, 0) + 1
+            for site in cell.sites:
+                species_counts[site] = species_counts.get(site, 0) + 1
         dist = {}
-        # Does not assume holes, but include holes if present.
-        total_count = sum([adsorbate_count
-            for species, adsorbate_count in species_counts.items()])
-        for species, adsorbate_count in species_counts.items():
-            dist[species] = adsorbate_count / total_count
+        # TODO: Okay to assume empty sites are occupied by a hole of some kind?
+        total_count = sum([count
+            for species, count in species_counts.items()])
+        for species, count in species_counts.items():
+            dist[species] = count / total_count
         sorted_distribution = [(s, "%.2f" % p) for s, p in sorted(
             dist.items(), key=lambda item: item[1], reverse=True)]
         return "(%d,%d){%r unique species: %r}" % (self.length, self.width,
@@ -56,18 +56,14 @@ class Cell(object):
         def _initialize_sites(num_sites, sites=None):
             if not num_sites and not sites:
                 raise CellException("Uninitialized sites")
-            if sites and len(sites) == num_sites:
+            if sites:
                 return sites
             return ["*_%d" % index for index in range(num_sites)]
 
         self.row = row
         self.col = col
+        # TODO: Okay to assume empty sites are occupied by a hole of some kind?
         self.sites = _initialize_sites(num_sites or 0, sites=sites)
-
-    # TODO: Okay to assume empty sites are occupied by a hole of some kind?
-    def get_adsorbates(self):
-        return [adsorbate if adsorbate else "*_%d" % index
-            for index, adsorbate in enumerate(self.sites)]
 
     def __repr__(self):
         return "(%d,%d)%r" % (self.row, self.col, self.sites)
