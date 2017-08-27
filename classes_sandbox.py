@@ -122,6 +122,7 @@ class EnabledCollection(object):
         # Pop lowest value (for est_perform_time), log n
         #
         # Nice to have:
+        # Evict expired processes eg prune values < x, min(# pruned, log n)
         #
         # Current top ideas:
         # Red-black tree
