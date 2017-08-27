@@ -7,12 +7,13 @@ K_MAX_TOY_DUMMY_SITES = 5
 
 def lattice_examples():
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
-        print("\n\n%d site(s) per cell:" %
+        print("%d site(s) per cell: " %
             num_sites)
         lattice = _populate_dummy_lattice(num_sites)
         print("Lattice: %r" % lattice)
         for cell in lattice.enumerate_cells():
             print(cell)
+        print("\n\n")
 
 
 def process_examples():
@@ -22,24 +23,24 @@ def process_examples():
         if num_sites == 1:
             remove = _populate_dummy_process(lattice, num_sites)
             process = remove
-            print("\n\n%d site(s) per cell: Removal of A" % num_sites)
+            print("%d site(s) per cell: Removal of A" % num_sites)
         if num_sites == 2:
             introduce = _populate_dummy_process(lattice, num_sites)
             process = introduce
-            print("\n\n%d site(s) per cell: Introduce O2" % num_sites)
+            print("%d site(s) per cell: Introduce O2" % num_sites)
         if num_sites == 3:
             swap_bridge = _populate_dummy_process(lattice, num_sites)
             process = swap_bridge
-            print("\n\n%d site(s) per cell: "
+            print("%d site(s) per cell: "
                 "SwapBridge-(bridge,bridge,hollow)(XYZ)" % num_sites)
         if num_sites == 4:
             clear_random = _populate_dummy_process(lattice, num_sites)
             process = clear_random
-            print("\n\n%d site(s) per cell: RandomFill" % num_sites)
+            print("%d site(s) per cell: RandomFill" % num_sites)
         if num_sites == 5:
             breakdown = _populate_dummy_process(lattice, num_sites)
             process = breakdown
-            print("\n\n%d site(s) per cell: Breakdown of CO2" % num_sites)
+            print("%d site(s) per cell: Breakdown of CO2" % num_sites)
         if process:
             print("before...")
             print("\t%r" % process.cell)
@@ -50,11 +51,12 @@ def process_examples():
             print("\t%r" % process.cell)
             print("\tLattice:\n\t%r" % lattice)
             print("\tProcess:\n\t%r" % process)
+        print("\n\n")
 
 
 def simulation_examples():
     simulation = Simulation()
-    print("\n\n%r" % simulation)
+    print("%r\n\n" % simulation)
 
 
 def _populate_dummy_process(lattice, num_sites):
