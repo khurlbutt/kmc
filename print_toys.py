@@ -1,3 +1,4 @@
+from classes_sandbox import EnabledCollection as EnabledCollection
 from classes_sandbox import Lattice as Lattice
 from classes_sandbox import Process as Process
 from classes_sandbox import Simulation as Simulation
@@ -57,6 +58,36 @@ def process_examples():
 def simulation_examples():
     simulation = Simulation()
     print("%r\n\n" % simulation)
+
+
+def enabled_collection_examples():
+    key_fn = Process.time_value
+    ec = EnabledCollection(key_fn=key_fn)
+    for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
+        lattice = _populate_dummy_lattice(num_sites)
+        process = None
+        if num_sites == 1:
+            remove = _populate_dummy_process(lattice, num_sites)
+            process = remove
+        if num_sites == 2:
+            introduce = _populate_dummy_process(lattice, num_sites)
+            process = introduce
+        if num_sites == 3:
+            swap_bridge = _populate_dummy_process(lattice, num_sites)
+            process = swap_bridge
+        if num_sites == 4:
+            clear_random = _populate_dummy_process(lattice, num_sites)
+            process = clear_random
+        if num_sites == 5:
+            breakdown = _populate_dummy_process(lattice, num_sites)
+            process = breakdown
+    ec.add(process)
+    print("Very simple pop process from EnabledCollection: ")
+    print("before:\n\t%r" % ec)
+    popped_process = ec.pop()
+    print("popped process:%r" % popped_process)
+    print("after:\n\t%r" % ec)
+    print("\n\n")
 
 
 def _populate_dummy_process(lattice, num_sites):

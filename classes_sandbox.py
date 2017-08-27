@@ -3,7 +3,7 @@ class Simulation(object):
 
     def __init__(self):
         self.lattice = Lattice()
-        self.potential_steps = EnabledCollection()
+        self.process_queue = EnabledCollection(key_fn=Process.time_value)
         self.time = 0  # Let's try staying integer/usec, can discuss options.
         # Enable processes
         # Draw a process, perform if possible, add new enabled processes.
@@ -11,7 +11,7 @@ class Simulation(object):
 
     def __repr__(self):
         return "t=%d\nLattice:%r\nEnabledCollection:%r" % (
-            self.time, self.lattice, self.potential_steps)
+            self.time, self.lattice, self.process_queue)
 
 
 class Lattice(object):
@@ -79,7 +79,7 @@ class Process(object):
         #                       considering lattice changes since entry into
         #                       EnabledCollection, i.e. a "null event" check
         # perform_fn : method for performing what process would do if enacted
-        self.est_perform_time = est_perform_time
+        self._est_perform_time = est_perform_time
         # TODO: Only cell indices
         self.cell = cell
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
@@ -90,6 +90,9 @@ class Process(object):
         # TODO: Only 2-tuple, e.g. index of function template, cell indices
         self._perform_fn = perform_fn
         self._is_performed = False
+
+    def time_value(self):
+        return int(self._est_perform_time)
 
     def perform(self):
         if not self.is_still_performable():
@@ -107,7 +110,7 @@ class Process(object):
 
     def __repr__(self):
         return "%r" % [
-            self.est_perform_time,
+            self._est_perform_time,
             (self.cell.row, self.cell.col),
             ("is_performed", self.is_performed()),
             ("_is_enabled_still_fn", self._is_enabled_still_fn),
@@ -116,7 +119,7 @@ class Process(object):
 
 class EnabledCollection(object):
 
-    def __init__(self):
+    def __init__(self, key_fn=None):
         # Requirements:
         # Add element, log n
         # Pop lowest value (for est_perform_time), log n
@@ -125,9 +128,32 @@ class EnabledCollection(object):
         # Evict expired processes eg prune values < x, min(# pruned, log n)
         #
         # Current top ideas:
-        # Red-black tree
-        #
-        pass
+        # SortedListWithKey
+        # http://www.grantjenks.com/docs/sortedcontainers/sortedlistwithkey.html
+        # IMHO this will do for early iterating; we could build our own, but
+        # honestly this is likely more performant. As a plus, it's pythonic AF.
+        assert key_fn, "Need callable for sorted process queue."
+        import sortedcontainers
+        self._queue = sortedcontainers.SortedListWithKey(key=key_fn)
+
+    def add(self, process):
+        # Assumes estimated performace time used as key.
+        self._queue.add(process)
+
+    def pop(self, raise_if_empty=False):
+        try:
+            return self._queue.pop(0)
+        except IndexError as e:
+            if raise_if_empty:
+                raise e
+            return None
+
+    def __repr__(self):
+        return "%d process%s, queue:%r" % (
+            len(self._queue),
+            "es" if len(self._queue) != 1 else "",
+            self._queue
+        )
 
 
 class CellException(Exception):
@@ -143,6 +169,7 @@ def main():
     print_toys.lattice_examples()
     print_toys.process_examples()
     print_toys.simulation_examples()
+    print_toys.enabled_collection_examples()
 
 
 if __name__ == '__main__':
