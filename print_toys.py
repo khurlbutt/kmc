@@ -24,24 +24,24 @@ def process_examples():
         if num_sites == 1:
             remove = _populate_dummy_process(lattice, num_sites)
             process = remove
-            print("%d site(s) per cell: Removal of A" % num_sites)
+            print("%d site per cell: Removal of A" % num_sites)
         if num_sites == 2:
             introduce = _populate_dummy_process(lattice, num_sites)
             process = introduce
-            print("%d site(s) per cell: Introduce O2" % num_sites)
+            print("%d sites per cell: Introduce O2" % num_sites)
         if num_sites == 3:
             swap_bridge = _populate_dummy_process(lattice, num_sites)
             process = swap_bridge
-            print("%d site(s) per cell: "
+            print("%d sites per cell: "
                 "SwapBridge-(bridge,bridge,hollow)(XYZ)" % num_sites)
         if num_sites == 4:
             clear_random = _populate_dummy_process(lattice, num_sites)
             process = clear_random
-            print("%d site(s) per cell: RandomFill" % num_sites)
+            print("%d site per cell: RandomFill" % num_sites)
         if num_sites == 5:
             breakdown = _populate_dummy_process(lattice, num_sites)
             process = breakdown
-            print("%d site(s) per cell: Breakdown of CO2" % num_sites)
+            print("%d site per cell: Breakdown of CO2" % num_sites)
         if process:
             print("before...")
             print("\t%r" % process.cell)
@@ -69,6 +69,14 @@ def enabled_collection_examples():
         if num_sites == 1:
             remove = _populate_dummy_process(lattice, num_sites)
             process = remove
+            ec.add(process)
+            print("%d site per cell: simple EnabledCollection .pop()" %
+                num_sites)
+            print("before:\n\t%r" % ec)
+            popped_process = ec.pop()
+            print("poppped process:\n\t%r" % popped_process)
+            print("after:\n\t%r" % ec)
+            print("\n\n")
         if num_sites == 2:
             introduce = _populate_dummy_process(lattice, num_sites)
             process = introduce
@@ -81,13 +89,6 @@ def enabled_collection_examples():
         if num_sites == 5:
             breakdown = _populate_dummy_process(lattice, num_sites)
             process = breakdown
-    ec.add(process)
-    print("Very simple pop process from EnabledCollection: ")
-    print("before:\n\t%r" % ec)
-    popped_process = ec.pop()
-    print("poppped process:\n\t%r" % popped_process)
-    print("after:\n\t%r" % ec)
-    print("\n\n")
 
 
 def _populate_dummy_process(lattice, num_sites):

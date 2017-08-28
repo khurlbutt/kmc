@@ -149,7 +149,7 @@ class EnabledCollection(object):
             return None
 
     def __repr__(self):
-        return "%d process%s, queue:%r" % (
+        return "%d process%s, %r" % (
             len(self._queue),
             "es" if len(self._queue) != 1 else "",
             self._queue
