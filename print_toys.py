@@ -1,7 +1,7 @@
-from classes_sandbox import EnabledCollection as EnabledCollection
-from classes_sandbox import Lattice as Lattice
-from classes_sandbox import Process as Process
-from classes_sandbox import Simulation as Simulation
+import data.enabled_collection
+import data.lattice
+import data.process
+import data.simulation
 
 K_MAX_TOY_DUMMY_SITES = 5
 
@@ -56,13 +56,13 @@ def process_examples():
 
 
 def simulation_examples():
-    simulation = Simulation()
+    simulation = data.simulation.Simulation()
     print("%r\n\n" % simulation)
 
 
 def enabled_collection_examples():
-    key_fn = Process.time_value
-    ec = EnabledCollection(key_fn=key_fn)
+    key_fn = data.process.Process.time_value
+    ec = data.enabled_collection.EnabledCollection(key_fn=key_fn)
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         lattice = _populate_dummy_lattice(num_sites)
         process = None
@@ -175,11 +175,12 @@ def _populate_dummy_process(lattice, num_sites):
         cell.sites = list(ending_sites)
 
     sim_time = 10  # Whatever for now.
-    return Process(sim_time, toy_cell, is_enabled_still_fn, perform_fn)
+    return data.process.Process(
+        sim_time, toy_cell, is_enabled_still_fn, perform_fn)
 
 
 def _populate_dummy_lattice(num_sites):
-    lattice = Lattice(length=2, width=2, num_sites=num_sites)
+    lattice = data.lattice.Lattice(length=2, width=2, num_sites=num_sites)
     if num_sites == 1:
         lattice.cells[0][0].sites = ["A"]
     elif num_sites == 2:
