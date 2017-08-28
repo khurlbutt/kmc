@@ -85,7 +85,7 @@ def enabled_collection_examples():
     print("Very simple pop process from EnabledCollection: ")
     print("before:\n\t%r" % ec)
     popped_process = ec.pop()
-    print("popped process:%r" % popped_process)
+    print("poppped process:\n\t%r" % popped_process)
     print("after:\n\t%r" % ec)
     print("\n\n")
 

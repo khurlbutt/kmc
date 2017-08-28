@@ -168,8 +168,9 @@ def main():
     import print_toys
     print_toys.lattice_examples()
     print_toys.process_examples()
-    print_toys.simulation_examples()
     print_toys.enabled_collection_examples()
+
+    print_toys.simulation_examples()
 
 
 if __name__ == '__main__':
