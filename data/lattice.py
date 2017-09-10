@@ -24,8 +24,7 @@ class Lattice(object):
                 species_counts[site] = species_counts.get(site, 0) + 1
         dist = {}
         # TODO: Okay to assume empty sites are occupied by a hole of some kind?
-        total_count = sum([count
-            for species, count in species_counts.items()])
+        total_count = sum([count for species, count in species_counts.items()])
         for species, count in species_counts.items():
             dist[species] = count / total_count
         sorted_distribution = [(s, "%.2f" % p) for s, p in sorted(
