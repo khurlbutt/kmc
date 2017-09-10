@@ -6,7 +6,7 @@ class EnabledCollection(object):
     def __init__(self, key_fn=None):
         # Requirements:
         # Add element, log n
-        # Pop lowest value (for est_perform_time), log n
+        # Pop lowest value by occurence time, log n
         #
         # Nice to have:
         # Evict expired processes eg prune values < x, min(# pruned, log n)
@@ -20,7 +20,7 @@ class EnabledCollection(object):
         self._queue = sortedcontainers.SortedListWithKey(key=key_fn)
 
     def add(self, process):
-        # Assumes estimated performace time used as key.
+        # Assumes occurence time used as key.
         self._queue.add(process)
 
     def pop(self, raise_if_empty=False):

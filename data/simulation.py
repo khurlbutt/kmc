@@ -8,7 +8,7 @@ class Simulation(object):
     def __init__(self):
         self.lattice = data.lattice.Lattice()
         self.process_queue = data.enabled_collection.EnabledCollection(
-            key_fn=data.process.Process.time_value)
+            key_fn=data.process.Process.key_fn)
         self.time = 0  # Let's try staying integer/usec, can discuss options.
         # Enable processes
         # Draw a process, perform if possible, add new enabled processes.

@@ -24,6 +24,18 @@ def lattice_examples():
 
 
 def process_examples():
+    def __current_sites(lattice, process):
+        sites = []
+        for global_site in list(process.transition_by_site.keys()):
+            cell_row = global_site[0]
+            cell_col = global_site[1]
+            local_site_index = global_site[2]
+            adsorbate = (
+                lattice.cells[cell_row][cell_col].sites[local_site_index])
+            sites.append(
+                "@(%d,%d,%d)%s" % (
+                    cell_row, cell_col, local_site_index, adsorbate))
+        return sorted(sites)
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         lattice = _populate_dummy_lattice(num_sites)
         process = None
@@ -49,15 +61,14 @@ def process_examples():
             process = breakdown
             print("%d site per cell: Breakdown of CO2" % num_sites)
         if process:
+            print("\tProcess:\n\t%r" % process)
             print("before...")
-            print("\t%r" % process.cell)
+            print("\tSites:\n\t%r" % __current_sites(lattice, process))
             print("\tLattice:\n\t%r" % lattice)
-            print("\tProcess:\n\t%r" % process)
-            process.perform()
+            process.perform(lattice)
             print("\nafter...")
-            print("\t%r" % process.cell)
+            print("\tSites:\n\t%r" % __current_sites(lattice, process))
             print("\tLattice:\n\t%r" % lattice)
-            print("\tProcess:\n\t%r" % process)
         print("\n\n")
 
 
@@ -67,7 +78,7 @@ def simulation_examples():
 
 
 def enabled_collection_examples():
-    key_fn = data.process.Process.time_value
+    key_fn = data.process.Process.key_fn
     ec = data.enabled_collection.EnabledCollection(key_fn=key_fn)
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         lattice = _populate_dummy_lattice(num_sites)
@@ -98,21 +109,34 @@ def enabled_collection_examples():
 
 
 def _populate_dummy_process(lattice, num_sites):
+    def __transition_by_site(cell, starting, ending):
+        transition_by_site = {}
+        assert len(starting) == len(ending)
+        for local_site_index in range(len(starting)):
+            before_adsorbate = starting[local_site_index]
+            after_adsorbate = ending[local_site_index]
+            global_site = (cell.row, cell.col, local_site_index)
+            transition_by_site[global_site] = (
+                before_adsorbate, after_adsorbate)
+        return transition_by_site
+
     possible_changes = {}
     if num_sites == 1:
-        starting_sites = ["A"]
-        ending_sites = ["*_0"]
+        starting = ["A"]
+        ending = ["*_0"]
         toy_cell = lattice.cells[0][0]
-        assert toy_cell.sites == starting_sites
+        assert toy_cell.sites == starting
+        transition_by_site = __transition_by_site(toy_cell, starting, ending)
         possible_changes.update({
             "*_0": ["A"],
             "A": ["*_0"],
         })
     elif num_sites == 2:
-        starting_sites = ["*_0", "CO"]
-        ending_sites = ["O2", "CO"]
+        starting = ["*_0", "CO"]
+        ending = ["O2", "CO"]
         toy_cell = lattice.cells[0][1]
-        assert toy_cell.sites == starting_sites
+        assert toy_cell.sites == starting
+        transition_by_site = __transition_by_site(toy_cell, starting, ending)
         possible_changes.update({
             "*_0": ["O2"],
             "*_1": ["CO"],
@@ -120,10 +144,11 @@ def _populate_dummy_process(lattice, num_sites):
             "CO": ["*_1"],
         })
     elif num_sites == 3:
-        starting_sites = ["X_bridge", "*_1", "Z_hollow"]
-        ending_sites = ["*_0", "Y_bridge", "Z_hollow"]
+        starting = ["X_bridge", "*_1", "Z_hollow"]
+        ending = ["*_0", "Y_bridge", "Z_hollow"]
         toy_cell = lattice.cells[1][0]
-        assert toy_cell.sites == starting_sites
+        assert toy_cell.sites == starting
+        transition_by_site = __transition_by_site(toy_cell, starting, ending)
         possible_changes.update({
             "*_0": ["X_bridge"],
             "*_1": ["Y_bridge"],
@@ -133,10 +158,11 @@ def _populate_dummy_process(lattice, num_sites):
             "Z_hollow": ["*_2"],
         })
     elif num_sites == 5:
-        starting_sites = ["*_0", "*_1", "CO2", "CO2", "*_4"]
-        ending_sites = ["CO", "CO", "*_2", "*_3", "O2"]
+        starting = ["*_0", "*_1", "CO2", "CO2", "*_4"]
+        ending = ["CO", "CO", "*_2", "*_3", "O2"]
         toy_cell = lattice.cells[0][1]
-        assert toy_cell.sites == starting_sites
+        assert toy_cell.sites == starting
+        transition_by_site = __transition_by_site(toy_cell, starting, ending)
         possible_changes.update({
             "*_0": ["CO"],
             "*_1": ["CO"],
@@ -148,41 +174,25 @@ def _populate_dummy_process(lattice, num_sites):
             "O2": ["*_4"],
         })
     else:
-        starting_sites = []
-        ending_sites = []
+        starting = []
+        ending = []
         for index in range(num_sites):
             hole_for_index = "*_%d" % index
             species = "<draw_allowable(cell, site_%d)>" % index
             possible_changes[species] = hole_for_index
             possible_changes[hole_for_index] = species
-            starting_sites.append(hole_for_index)
-            ending_sites.append(species)
+            starting.append(hole_for_index)
+            ending.append(species)
         toy_cell = lattice.cells[0][1]
-        assert toy_cell.sites == starting_sites
-    for starting_site, ending_site in zip(starting_sites, ending_sites):
+        assert toy_cell.sites == starting
+        transition_by_site = __transition_by_site(toy_cell, starting, ending)
+    for starting_site, ending_site in zip(starting, ending):
         valid_site_change = ending_site in possible_changes[starting_site]
         assert (starting_site == ending_site) or valid_site_change
 
-    def is_enabled_still_fn(cell):
-        # TODO: Quite naive, need to check whether sites have updated since time
-        #       when process became enabled.
-        if len(cell.sites) in range(K_MAX_TOY_DUMMY_SITES + 1):
-            # Type tuple is immuatable; create a copy.
-            if tuple(cell.sites) == tuple(starting_sites):
-                return True
-        else:
-            assert False, "No possible case to return True."
-        return False
-
-    def perform_fn(cell):
-        # TODO: Quite naive, need to update site update times to avoid
-        #       performing expired processes at a later point.
-        # Type list is mutable, but this creates a copy for us... maybe too much
-        cell.sites = list(ending_sites)
-
-    sim_time = 10  # Whatever for now.
-    return data.process.Process(
-        sim_time, toy_cell, is_enabled_still_fn, perform_fn)
+    sim_step = 1  # Whatever for now.
+    occurence_time = 0.027  # Whatever for now.
+    return data.process.Process(sim_step, occurence_time, transition_by_site)
 
 
 def _populate_dummy_lattice(num_sites):

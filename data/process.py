@@ -2,44 +2,56 @@
 
 class Process(object):
 
-    def __init__(self, est_perform_time, cell, is_enabled_still_fn, perform_fn):
-        # From what I can tell a simple model might use 4 inputs:
-        # est_perform_time : estimated time(step) of occurence
-        # cell : lattice cell in question
-        # is_enabled_still_fn : method to know if process still "allowed" after
-        #                       considering lattice changes since entry into
-        #                       EnabledCollection, i.e. a "null event" check
-        # perform_fn : method for performing what process would do if enacted
-        self._est_perform_time = est_perform_time
-        # TODO: Only cell indices
-        self.cell = cell
-        # TODO: Only 2-tuple, e.g. index of function template, cell indices
-        # TODO: This must invalidate processes involving sites updated since
-        #       process est_perform_time to avoid oversampling expired processes
-        #       that otherwise meet enablement criteria.
-        self._is_enabled_still_fn = is_enabled_still_fn
-        # TODO: Only 2-tuple, e.g. index of function template, cell indices
-        self._perform_fn = perform_fn
+    def __init__(self, enabled_step, occurence_time, transition_by_site):
+        assert isinstance(enabled_step, int)
+        assert isinstance(transition_by_site, dict)
 
-    def time_value(self):
-        return int(self._est_perform_time)
+        self.enabled_step = enabled_step
+        self.occurence_time = occurence_time
+        # Map of 3-tuple (row, col, site_index) to 2-tuple (before, after)
+        self.transition_by_site = transition_by_site
 
-    def perform(self):
-        if not self.is_still_performable():
+    def key_fn(self):
+        # Used by data.enabled_collection.EnabledCollection for sorting.
+        return self.occurence_time
+
+    def perform(self, lattice):
+        if not self.is_still_performable(lattice):
             raise LatticeProcessException("Not performable")
-        self._perform_fn(self.cell)
+        for global_site, transition in self.transition_by_site.items():
+            cell_row = global_site[0]
+            cell_col = global_site[1]
+            local_site_index = global_site[2]
+            after_adsorbate = transition[1]
 
-    def is_still_performable(self):
-        # Assumes that references to cell sites updated elsewhere. Eventually,
-        # may need to reference neighbors using cell.row or cell.col.
-        return self._is_enabled_still_fn(self.cell)
+            lattice.cells[cell_row][cell_col].sites[local_site_index] = (
+                after_adsorbate)
+
+    def is_still_performable(self, lattice):
+        for global_site, transition in self.transition_by_site.items():
+            cell_row = global_site[0]
+            cell_col = global_site[1]
+            local_site_index = global_site[2]
+            before_adsorbate = transition[0]
+
+            curr = lattice.cells[cell_row][cell_col].sites[local_site_index]
+            if before_adsorbate != curr:
+                return False
+            # TODO: Blocked by sites not yet storing last updated step.
+            # if site.last_updated_step > self.enabled_step:
+            #     return False
+
+        return True
 
     def __repr__(self):
         return "%r" % [
-            self._est_perform_time,
-            (self.cell.row, self.cell.col),
-            ("_is_enabled_still_fn", self._is_enabled_still_fn),
-            ("_perform_fn", self._perform_fn)]
+            self.enabled_step,
+            self.occurence_time,
+            "transitions_by_site: %r" % sorted([
+                "@(%d,%d,%d)%s -> %s" % (
+                    site[0], site[1], site[2], transition[0], transition[1])
+                for site, transition in self.transition_by_site.items()]),
+        ]
 
 
 class LatticeProcessException(Exception):
