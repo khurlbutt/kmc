@@ -15,7 +15,6 @@
       {% for index in range(num_dummy_examples) %}
         {% set num_sites = index + 1 %}
         <br/>
-        {{ num_sites }}
          <a href="{{ "/print-toy/%s" % num_sites }}">{{ num_sites }} site{{ "s" if num_sites != 1 else "" }}</a>
       {% end %}
       <br/>
