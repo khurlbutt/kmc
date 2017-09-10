@@ -10,13 +10,11 @@
   <body>
     <h1>Welcome to kMC</h1>
       <p>This web page is under constuction, but check out our sample lattices!</p>
-      <br/>
-      <b>Dummy Unit Cells</b>
+    <h4>Dummy Unit Cells</h4>
       {% for index in range(num_dummy_examples) %}
         {% set num_sites = index + 1 %}
+        <a href="{{ "/print-toy/%s" % num_sites }}">{{ num_sites }} site{{ "s" if num_sites != 1 else "" }}</a>
         <br/>
-         <a href="{{ "/print-toy/%s" % num_sites }}">{{ num_sites }} site{{ "s" if num_sites != 1 else "" }}</a>
       {% end %}
-      <br/>
   </body>
 </html>
