@@ -1,0 +1,23 @@
+{% set num_dummy_examples %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>kMC Home Page</title>
+    <link rel="stylesheet" href="{{ static_url("home.css") }}" type="text/css">
+  </head>
+  <body>
+    <h1>Welcome to kMC</h1>
+      <p>This web page is under constuction, but check out our sample lattices!</p>
+      <br/>
+      <b>Dummy Unit Cells</b>
+      {% for index in range(num_dummy_examples) %}
+        {% set num_sites = index + 1 %}
+        <br/>
+        {{ num_sites }}
+         <a href="{{ "/print-toy/%s" % num_sites }}">{{ num_sites }} site{{ "s" if num_sites != 1 else "" }}</a>
+      {% end %}
+      <br/>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+{% set lattice %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lattice</title>
+    <link rel="stylesheet" href="{{ static_url("lattice.css") }}" type="text/css">
+  </head>
+  <body>
+    <p><b>Python __repr__</b>: {{ lattice }}</p>
+
+    <div>
+      <table>
+        {% for row in range(lattice.length) %}
+          <tr>
+            {% for col in range(lattice.width) %}
+              <td>
+                {{ lattice.cells[row][col] }}
+              </td>
+            {% end %}
+          </tr>
+        {% end %}
+      </table>
+    </div>
+
+  </body>
+</html>

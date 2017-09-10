@@ -6,6 +6,12 @@ import data.simulation
 K_MAX_TOY_DUMMY_SITES = 5
 
 
+def get_dummy_lattice(num_dummy_sites):
+    if num_dummy_sites > K_MAX_TOY_DUMMY_SITES:
+        raise PrintToysError("Too many dummy sites, no example defined.")
+    return _populate_dummy_lattice(num_dummy_sites)
+
+
 def lattice_examples():
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         print("%d site(s) per cell: " %
@@ -204,3 +210,7 @@ def _populate_dummy_lattice(num_sites):
             for index in range(num_sites)]
         lattice.cells[0][0].sites = example_sites
     return lattice
+
+
+class PrintToysError(Exception):
+    pass
