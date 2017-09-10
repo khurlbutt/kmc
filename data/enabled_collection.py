@@ -33,7 +33,5 @@ class EnabledCollection(object):
 
     def __repr__(self):
         return "%d process%s, %r" % (
-            len(self._queue),
-            "es" if len(self._queue) != 1 else "",
-            self._queue
+            len(self._queue), "es" if len(self._queue) != 1 else "", self._queue
         )
