@@ -10,6 +10,8 @@ class Process(object):
         self.occurence_time = occurence_time
         # Map of 3-tuple (row, col, site_index) to 2-tuple (before, after)
         self.transition_by_site = transition_by_site
+        # Convenience, assumes transition_by_site is immutable.
+        self.sites = list(transition_by_site.keys())
 
     def key_fn(self):
         # Used by data.enabled_collection.EnabledCollection for sorting.
