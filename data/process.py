@@ -47,7 +47,7 @@ class Process(object):
         return "%r" % [
             self.enabled_step,
             self.occurence_time,
-            "transitions_by_site: %r" % sorted([
+            "transition_by_site: %r" % sorted([
                 "@(%d,%d,%d)%s -> %s" % (
                     site[0], site[1], site[2], transition[0], transition[1])
                 for site, transition in self.transition_by_site.items()]),
