@@ -1,25 +1,32 @@
+import data.site
 
 
 class Cell(object):
 
-    def __init__(self, row, col, num_sites=None, sites=None):
+    def __init__(self, coordinates, num_sites):
+        assert isinstance(num_sites, int) and num_sites > 0
 
-        # User-defined indices map to a particular model.
+        self.coordinates = tuple(coordinates)  # eg (x, y)
+        # eg (x, y, s) or (r, theta, s) or something else, up to YOU!
         # TODO: Okay to assume empty sites are occupied by a hole of some kind?
-        def _initialize_sites(num_sites, sites=None):
-            if not num_sites and not sites:
-                raise CellException("Uninitialized sites")
-            if sites:
-                return sites
-            return ["*_%d" % index for index in range(num_sites)]
+        sites_coordinates = [self.coordinates + (index, )
+            for index in range(num_sites)]
+        empty_sites = [data.site.Site(site_coordinates, "*_%d" % index)
+            for index, site_coordinates in enumerate(sites_coordinates)]
+        self.sites = {site_coordinates: empty_site
+            for site_coordinates, empty_site in zip(
+                sites_coordinates, empty_sites)}
 
-        self.row = row
-        self.col = col
-        # TODO: Okay to assume empty sites are occupied by a hole of some kind?
-        self.sites = _initialize_sites(num_sites or 0, sites=sites)
+    def site_states(self):
+        for site in self:
+            yield site.state
+
+    def __iter__(self):
+        for site_coordinates in sorted(self.sites):
+            yield self.sites[site_coordinates]
 
     def __repr__(self):
-        return "(%d,%d)%r" % (self.row, self.col, self.sites)
+        return "%r,%r" % (self.coordinates, list(self.site_states()))
 
 
 class CellException(Exception):

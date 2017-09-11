@@ -11,7 +11,7 @@ class Process(object):
         # Map of 3-tuple (row, col, site_index) to 2-tuple (before, after)
         self.transition_by_site = transition_by_site
         # Convenience, assumes transition_by_site is immutable.
-        self.sites = list(transition_by_site.keys())
+        self.sites_coordinates = list(transition_by_site.keys())
 
     def key_fn(self):
         # Used by data.enabled_collection.EnabledCollection for sorting.
@@ -20,38 +20,26 @@ class Process(object):
     def perform(self, lattice):
         if not self.is_still_performable(lattice):
             raise LatticeProcessException("Not performable")
-        for global_site, transition in self.transition_by_site.items():
-            cell_row = global_site[0]
-            cell_col = global_site[1]
-            local_site_index = global_site[2]
+        for site_coordinates, transition in self.transition_by_site.items():
             after_adsorbate = transition[1]
-
-            lattice.cells[cell_row][cell_col].sites[local_site_index] = (
-                after_adsorbate)
+            lattice.sites[site_coordinates].state = after_adsorbate
 
     def is_still_performable(self, lattice):
-        for global_site, transition in self.transition_by_site.items():
-            cell_row = global_site[0]
-            cell_col = global_site[1]
-            local_site_index = global_site[2]
+        for site_coordinates, transition in self.transition_by_site.items():
+            site = lattice.sites[site_coordinates]
             before_adsorbate = transition[0]
-
-            curr = lattice.cells[cell_row][cell_col].sites[local_site_index]
-            if before_adsorbate != curr:
+            if before_adsorbate != site.state:
                 return False
             # TODO: Blocked by sites not yet storing last updated step.
             # if site.last_updated_step > self.enabled_step:
             #     return False
-
         return True
 
     def __repr__(self):
         return "%r" % [
             self.enabled_step,
             self.occurence_time,
-            "transition_by_site: %r" % sorted([
-                "@(%d,%d,%d)%s -> %s" % (
-                    site[0], site[1], site[2], transition[0], transition[1])
+            sorted(["@%r%s -> %s" % (site, transition[0], transition[1])
                 for site, transition in self.transition_by_site.items()]),
         ]
 
