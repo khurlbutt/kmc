@@ -198,43 +198,42 @@ def _populate_dummy_process(lattice, num_sites):
 
 
 def _populate_dummy_lattice(num_sites):
+    def __update_lattice_cell(lattice, cell_coordinates, new_states):
+        for index, state in enumerate(new_states):
+            site_coordinates = cell_coordinates + (index,)
+            lattice.sites[site_coordinates].state = state
+
     lattice = data.lattice.Lattice(num_sites=num_sites)
     if num_sites == 1:
-        for index, state in enumerate(["A"]):
-            lattice.sites[(0, 0, index)].state = state
+        __update_lattice_cell(lattice, (0, 0), ["A"])
     elif num_sites == 2:
-        for index, state in enumerate(["O2", "CO"]):
-            lattice.sites[(0, 0, index)].state = state
-        for index, state in enumerate(["*_0", "CO"]):
-            lattice.sites[(0, 1, index)].state = state
-        for index, state in enumerate(["O2", "*_1"]):
-            lattice.sites[(1, 0, index)].state = state
+        __update_lattice_cell(lattice, (0, 0), ["O2", "CO"])
+        __update_lattice_cell(lattice, (0, 1), ["*_0", "CO"])
+        __update_lattice_cell(lattice, (1, 0), ["O2", "*_1"])
         # Empty (1, 1,)
     elif num_sites == 3:
-        for index, state in enumerate(["X_bridge", "Y_bridge", "*_2"]):
-            lattice.sites[(0, 0, index)].state = state
-        for index, state in enumerate(["*_0", "*_1", "Z_hollow"]):
-            lattice.sites[(0, 1, index)].state = state
-        for index, state in enumerate(["X_bridge", "*_1", "Z_hollow"]):
-            lattice.sites[(1, 0, index)].state = state
-        for index, state in enumerate(["*_0", "Y_bridge", "Z_hollow"]):
-            lattice.sites[(1, 1, index)].state = state
+        __update_lattice_cell(
+            lattice, (0, 0), ["X_bridge", "Y_bridge", "*_2"])
+        __update_lattice_cell(
+            lattice, (0, 1), ["*_0", "*_1", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (1, 0), ["X_bridge", "*_1", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (1, 1), ["*_0", "Y_bridge", "Z_hollow"])
     elif num_sites == 5:
-        for index, state in enumerate(["*_0", "*_1", "*_2", "*_3", "*_4"]):
-            lattice.sites[(0, 0, index)].state = state
-        for index, state in enumerate(["*_0", "*_1", "CO2", "CO2", "*_4"]):
-            lattice.sites[(0, 1, index)].state = state
-        for index, state in enumerate(["CO", "CO", "*_2", "*_3", "O2"]):
-            lattice.sites[(1, 0, index)].state = state
-        for index, state in enumerate(["CO", "CO", "*_2", "*_3", "O2"]):
-            lattice.sites[(1, 1, index)].state = state
-
+        __update_lattice_cell(
+            lattice, (0, 0), ["*_0", "*_1", "*_2", "*_3", "*_4"])
+        __update_lattice_cell(
+            lattice, (0, 1), ["*_0", "*_1", "CO2", "CO2", "*_4"])
+        __update_lattice_cell(
+            lattice, (1, 0), ["CO", "CO", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (1, 1), ["CO", "CO", "*_2", "*_3", "O2"])
     else:
         # Exists a dist of "allowed" occupants, dependpent on cell's state.
-        example_sites = ["<draw_allowable(cell, site_%d)>" % index
+        example_site_states = ["<draw_allowable(cell, site_%d)>" % index
             for index in range(num_sites)]
-        for index, state in enumerate(example_sites):
-            lattice.sites[(0, 0, index)].state = state
+        __update_lattice_cell(lattice, (0, 0), example_site_states)
     return lattice
 
 
