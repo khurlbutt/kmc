@@ -11,29 +11,31 @@ class Lattice(object):
         self.sites_per_cell = sites_per_cell
         self.coordinate_cardinalities = axis_lengths + (sites_per_cell,)
         coord_sets = [list(range(cc)) for cc in self.coordinate_cardinalities]
-        # Default to (x, y) here. But (r, theta, z) is equally chill.
+        # Default to (x, y, s) here. But (r, theta, z) is equally chill.
         coord_points = list(itertools.product(*coord_sets))
-        empty_cells = [data.cell.Cell(cell_coordinates, sites_per_cell or 1)
-            for cell_coordinates in coord_points]
-        self.cells = {cell.coordinates: cell for cell in empty_cells}
+
+        empty_sites = [data.site.Site(coords, "*_%d" % coords[-1])
+            for coords in coord_points]
+        self.sites = {site.coordinates: site for site in empty_sites}
 
         # Ends up storing all the site bookkeeping twice... here and on cells.
-        self.sites = {}
-        for cell in self.iter_cells():
-            for site in cell:
-                self.sites[site.coordinates] = site
+        cells_coordinates = set()
+        for site in self.iter_sites():
+            cells_coordinates.add(site.coordinates[:-1])
+        empty_cells = [data.cell.Cell(self, cell_coordinates)
+            for cell_coordinates in cells_coordinates]
+        self.cells = {cell.coordinates: cell for cell in empty_cells}
 
-    def iter_cells(self):
+    def iter_sites(self):
         # Example of a generator-iterator as described by PEP 255.
         # Intro to generators as "lazy evaluation" or "calculation on demand":
         #   http://intermediatepythonista.com/python-generators
+        for site_coordinates in sorted(self.sites):
+            yield self.sites[site_coordinates]
+
+    def iter_cells(self):
         for cell_coordinates in sorted(self.cells):
             yield self.cells[cell_coordinates]
-
-    def iter_sites(self):
-        for cell in self.iter_cells():
-            for site in cell:
-                yield site
 
     def __repr__(self):
         species_counts = {}

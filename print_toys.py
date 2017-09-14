@@ -203,7 +203,7 @@ def _populate_dummy_lattice(num_sites):
             site_coordinates = cell_coordinates + (index,)
             lattice.sites[site_coordinates].state = state
 
-    lattice = data.lattice.Lattice(num_sites=num_sites)
+    lattice = data.lattice.Lattice(sites_per_cell=num_sites)
     if num_sites == 1:
         __update_lattice_cell(lattice, (0, 0), ["A"])
     elif num_sites == 2:

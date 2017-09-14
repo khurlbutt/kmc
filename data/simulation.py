@@ -33,7 +33,7 @@ class Simulation(object):
     def _initialize_process_queue(self):
         self.process_queue = data.enabled_collection.EnabledCollection(
             key_fn=data.process.Process.key_fn)
-        self._update_process_queue(self.lattice.enumerate_sites())
+        self._update_process_queue(self.lattice.iter_sites())
 
     def _update_process_queue(self, sites):
         running_process_set = set()

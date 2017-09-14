@@ -1,21 +1,17 @@
-import data.site
 
 
 class Cell(object):
 
-    def __init__(self, coordinates, num_sites):
+    def __init__(self, lattice, coordinates):
+        assert lattice and lattice.coordinate_cardinalities
+        num_sites = lattice.coordinate_cardinalities[-1]
         assert isinstance(num_sites, int) and num_sites > 0
 
         self.coordinates = tuple(coordinates)  # eg (x, y)
-        # eg (x, y, s) or (r, theta, s) or something else, up to YOU!
-        # TODO: Okay to assume empty sites are occupied by a hole of some kind?
         sites_coordinates = [self.coordinates + (index, )
             for index in range(num_sites)]
-        empty_sites = [data.site.Site(site_coordinates, "*_%d" % index)
-            for index, site_coordinates in enumerate(sites_coordinates)]
-        self.sites = {site_coordinates: empty_site
-            for site_coordinates, empty_site in zip(
-                sites_coordinates, empty_sites)}
+        self.sites = {site_coordinates: lattice.sites[site_coordinates]
+            for site_coordinates in sites_coordinates}
 
     def site_states(self):
         for site in self:
