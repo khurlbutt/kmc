@@ -8,10 +8,10 @@ class Simulation(object):
     def __init__(self):
         self._initialize_lattice()
         self._initialize_process_queue()
-        self.time = 0.0
+        self.time = int(0)  # Keep as an int or long, either usec or nsec etc.
         self.step = 0
 
-        self.STOP_TIME = -1.0
+        self.STOP_TIME = -1
         self.STOP_STEP = 100
 
         # Enable processes
@@ -20,6 +20,7 @@ class Simulation(object):
 
     def run(self):
         while self._continue_sim():
+            # What would it mean if this popped None (was empty)?
             next_process = self.process_queue.pop()
             if next_process.is_still_performable(self.lattice):
                 self.step += 1
