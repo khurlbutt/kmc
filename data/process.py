@@ -28,11 +28,10 @@ class Process(object):
         for site_coordinates, transition in self.transition_by_site.items():
             site = lattice.sites[site_coordinates]
             before_adsorbate = transition[0]
+            if self.enabled_step < site.last_update_step:
+                return False
             if before_adsorbate != site.state:
                 return False
-            # TODO: Blocked by sites not yet storing last updated step.
-            # if site.last_updated_step > self.enabled_step:
-            #     return False
         return True
 
     def __repr__(self):
