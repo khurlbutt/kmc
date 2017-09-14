@@ -2,12 +2,12 @@
 
 class Process(object):
 
-    def __init__(self, enabled_step, occurence_time, transition_by_site):
+    def __init__(self, enabled_step, transition_by_site):
         assert isinstance(enabled_step, int)
         assert isinstance(transition_by_site, dict)
 
         self.enabled_step = enabled_step
-        self.occurence_time = occurence_time
+        self.occurence_time = None
         # Map of 3-tuple (row, col, site_index) to 2-tuple (before, after)
         self.transition_by_site = transition_by_site
         # Convenience, assumes transition_by_site is immutable.
@@ -15,7 +15,13 @@ class Process(object):
 
     def key_fn(self):
         # Used by data.enabled_collection.EnabledCollection for sorting.
+        if self.occurence_time is None:
+            raise LatticeProcessException("Occurence time never initialized.")
         return self.occurence_time
+
+    def generate_occurence_time(self, current_time):
+        # TODO...
+        self.occurence_time = current_time + 1
 
     def perform(self, lattice):
         if not self.is_still_performable(lattice):

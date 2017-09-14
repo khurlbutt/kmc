@@ -34,18 +34,18 @@ class Simulation(object):
     def _initialize_process_queue(self):
         self.process_queue = data.enabled_collection.EnabledCollection(
             key_fn=data.process.Process.key_fn)
-        self._update_process_queue(self.lattice.iter_sites())
+        self.update_process_queue(self.lattice.iter_sites())
 
-    def _update_process_queue(self, sites):
-        running_process_set = set()
+    def update_process_queue(self, sites):
+        newly_enabled_processes = set()
+        # Times not generated, avoid enqueuing the same process more than once.
         for site in sites:
-            running_process_set.add(
-                self._update_process_queue_helper(site))
-        for process in running_process_set:
-            process.generate_expected_time()
+            newly_enabled_processes.add(self._find_enabled_processes(site))
+        for process in newly_enabled_processes:
+            process.generate_occurence_time(self.time)
             self.process_queue.add(process)
 
-    def _update_process_queue_helper(self, site):
+    def _find_enabled_processes(self, site):
         # TODO...
         return set()
 
