@@ -4,14 +4,17 @@ import data.cell
 
 class Lattice(object):
 
-    def __init__(self, *, axis_lengths=None, num_sites=None):
-        self.coordinante_cardinalites = axis_lengths or (2, 2)
+    def __init__(self, *, axis_lengths=None, sites_per_cell=None):
+        axis_lengths = axis_lengths or (10, 10)
+        sites_per_cell = sites_per_cell or 1
 
-        axis_sets = [list(range(cc)) for cc in self.coordinante_cardinalites]
+        self.sites_per_cell = sites_per_cell
+        self.coordinate_cardinalities = axis_lengths + (sites_per_cell,)
+        coord_sets = [list(range(cc)) for cc in self.coordinate_cardinalities]
         # Default to (x, y) here. But (r, theta, z) is equally chill.
-        coordinate_points = list(itertools.product(*axis_sets))
-        empty_cells = [data.cell.Cell(cell_coordinates, num_sites or 1)
-            for cell_coordinates in coordinate_points]
+        coord_points = list(itertools.product(*coord_sets))
+        empty_cells = [data.cell.Cell(cell_coordinates, sites_per_cell or 1)
+            for cell_coordinates in coord_points]
         self.cells = {cell.coordinates: cell for cell in empty_cells}
 
         # Ends up storing all the site bookkeeping twice... here and on cells.
@@ -44,5 +47,5 @@ class Lattice(object):
         sorted_distribution = [(s, "%.2f" % p) for s, p in sorted(
             dist.items(), key=lambda item: item[1], reverse=True)]
         return "(%r){%r unique species: %r}" % (
-            "x".join([str(c) for c in self.coordinante_cardinalites]),
+            "x".join([str(c) for c in self.coordinate_cardinalities]),
             len(species_counts), sorted_distribution)
