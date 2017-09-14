@@ -193,8 +193,10 @@ def _populate_dummy_process(lattice, num_sites):
         assert (starting_site == ending_site) or valid_site_change
 
     sim_step = 1  # Whatever for now.
-    occurence_time = 0.027  # Whatever for now.
-    return data.process.Process(sim_step, occurence_time, transition_by_site)
+    current_time = 7  # Whatever for now.
+    process = data.process.Process(sim_step, transition_by_site)
+    process.generate_occurence_time(current_time)
+    return process
 
 
 def _populate_dummy_lattice(num_sites):
