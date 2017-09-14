@@ -1,6 +1,7 @@
 import data.enabled_collection
 import data.lattice
 import data.process
+import random
 
 
 class Simulation(object):
@@ -46,8 +47,18 @@ class Simulation(object):
             self.process_queue.add(process)
 
     def _find_enabled_processes(self, site):
-        # TODO...
-        return set()
+        # Only for /print-toys/1
+        if site.state == "A":
+            state = "*_0"
+        elif site.state == "*_0":
+            state = "A"
+        return set([
+            data.process.Process(
+                self.step,
+                self.time + random.choice([1, 2, 3]),
+                {site.coordinates: state}
+            )
+        ])
 
     def _continue_sim(self):
         # TODO include more flexibility on stop conditions
