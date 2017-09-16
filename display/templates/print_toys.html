@@ -11,6 +11,31 @@
   <body>
     <p><b>Lattice: python __repr__</b>: {{ lattice }}</p>
 
+    <br/>
+    <br/>
+
+    <p><b>simplified comma cells</b><i> (holes unindexed, e.g. *)</i></p>
+    <div>
+      <table>
+        {% for row in range(lattice.coordinate_cardinalities[0]) %}
+          <tr>
+            {% for col in range(lattice.coordinate_cardinalities[1]) %}
+              {% set cell = lattice.cells[(row, col)] %}
+              {% set states = list(cell.site_states()) %}
+              {% set simplified_states = [site.split("_")[0] if "_" in site else site for site in states] %}
+              <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
+                {{ ",".join(simplified_states) }}
+              </td>
+            {% end %}
+          </tr>
+        {% end %}
+      </table>
+    </div>
+
+    <br/>
+    <br/>
+
+    <p><b>python __repr__ cells</b><i> (holes indexed, e.g. *_0)</i></p>
     <div>
       <table>
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
