@@ -218,7 +218,7 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
         __update_lattice_cell(
             lattice, (0, 1), ["*_0", "Y_bridge", "*_2"])
         __update_lattice_cell(
-            lattice, (0, 2), ["*_0", "Y_bridge", "*_2"])
+            lattice, (0, 3), ["*_0", "Y_bridge", "*_2"])
         __update_lattice_cell(
             lattice, (1, 0), ["X_bridge", "*_1", "*_2"])
         __update_lattice_cell(
