@@ -6,10 +6,10 @@ import data.simulation
 K_MAX_TOY_DUMMY_SITES = 5
 
 
-def get_dummy_lattice(num_dummy_sites):
+def get_dummy_lattice(axis_lengths, num_dummy_sites):
     if num_dummy_sites > K_MAX_TOY_DUMMY_SITES:
         raise PrintToysError("Too many dummy sites, no example defined.")
-    return _populate_dummy_lattice(num_dummy_sites)
+    return _populate_dummy_lattice(num_dummy_sites, axis_lengths=axis_lengths)
 
 
 def lattice_examples():
@@ -134,11 +134,11 @@ def _populate_dummy_process(lattice, num_sites):
     elif num_sites == 3:
         starting = ["X_bridge", "*_1", "Z_hollow"]
         ending = ["*_0", "Y_bridge", "Z_hollow"]
-        toy_cell = lattice.cells[(1, 0)]
+        toy_cell = lattice.cells[(2, 1)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {
-            (1, 0, 0): (starting[0], ending[0]),
-            (1, 0, 1): (starting[1], ending[1]),
+            (2, 1, 0): (starting[0], ending[0]),
+            (2, 1, 1): (starting[1], ending[1]),
         }
         # TODO
         possible_changes.update({
@@ -199,13 +199,14 @@ def _populate_dummy_process(lattice, num_sites):
     return process
 
 
-def _populate_dummy_lattice(num_sites):
+def _populate_dummy_lattice(num_sites, axis_lengths=None):
     def __update_lattice_cell(lattice, cell_coordinates, new_states):
         for index, state in enumerate(new_states):
             site_coordinates = cell_coordinates + (index,)
             lattice.sites[site_coordinates].state = state
 
-    lattice = data.lattice.Lattice(sites_per_cell=num_sites)
+    lattice = data.lattice.Lattice(
+        axis_lengths=axis_lengths, sites_per_cell=num_sites)
     if num_sites == 1:
         __update_lattice_cell(lattice, (0, 0), ["A"])
     elif num_sites == 2:
@@ -215,13 +216,31 @@ def _populate_dummy_lattice(num_sites):
         # Empty (1, 1,)
     elif num_sites == 3:
         __update_lattice_cell(
-            lattice, (0, 0), ["X_bridge", "Y_bridge", "*_2"])
+            lattice, (0, 1), ["*_0", "Y_bridge", "*_2"])
         __update_lattice_cell(
-            lattice, (0, 1), ["*_0", "*_1", "Z_hollow"])
+            lattice, (0, 2), ["*_0", "Y_bridge", "*_2"])
         __update_lattice_cell(
-            lattice, (1, 0), ["X_bridge", "*_1", "Z_hollow"])
+            lattice, (1, 0), ["X_bridge", "*_1", "*_2"])
         __update_lattice_cell(
-            lattice, (1, 1), ["*_0", "Y_bridge", "Z_hollow"])
+            lattice, (1, 1), ["X_bridge", "Y_bridge", "*_2"])
+        __update_lattice_cell(
+            lattice, (1, 2), ["*_0", "Y_bridge", "*_2"])
+        __update_lattice_cell(
+            lattice, (1, 3), ["X_bridge", "Y_bridge", "*_2"])
+        for coords in [(2, 0), (2, 1)]:
+            __update_lattice_cell(
+                lattice, coords, ["X_bridge", "*_1", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (2, 2), ["X_bridge", "Y_bridge", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (2, 3), ["X_bridge", "Y_bridge", "*_2"])
+        for coords in [(3, 0), (3, 1)]:
+            __update_lattice_cell(
+                lattice, coords, ["*_0", "*_1", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (3, 2), ["*_0", "Y_bridge", "Z_hollow"])
+        __update_lattice_cell(
+            lattice, (3, 3), ["X_bridge", "Y_bridge", "Z_hollow"])
     elif num_sites == 5:
         __update_lattice_cell(
             lattice, (0, 0), ["*_0", "*_1", "*_2", "*_3", "*_4"])
@@ -237,6 +256,37 @@ def _populate_dummy_lattice(num_sites):
             for index in range(num_sites)]
         __update_lattice_cell(lattice, (0, 0), example_site_states)
     return lattice
+
+
+def bgcolor_for_cell(cell):
+    states = list(cell.site_states())
+    assert len(states) <= K_MAX_TOY_DUMMY_SITES, "Likely undefined."
+    if states == ["A"]:
+        return "lightblue"
+    elif len(states) == 2:
+        if states == ["*_0", "CO"]:
+            return "orange"
+        if states == ["O2", "*_1"]:
+            return "yellow"
+        if states == ["O2", "CO"]:
+            return "red"
+    elif len(states) == 3:
+        if states == ["*_0", "*_1", "Z_hollow"]:
+            return "salmon"
+        if states == ["X_bridge", "Y_bridge", "*_2"]:
+            return "cyan"
+        if (states == ["X_bridge", "*_1", "*_2"] or
+                states == ["*_0", "Y_bridge", "*_2"]):
+            return "lightblue"
+        if (states == ["*_0", "Y_bridge", "Z_hollow"] or
+                states == ["X_bridge", "*_1", "Z_hollow"]):
+            return "orchid"
+        if states == ["X_bridge", "Y_bridge", "Z_hollow"]:
+            return "darkorchid"
+    elif len(states) == 5:
+            pass
+
+    return "white"
 
 
 class PrintToysError(Exception):

@@ -1,4 +1,5 @@
 {% set lattice %}
+{% set bgcolor_for_cell %}
 
 <!DOCTYPE html>
 <html>
@@ -8,15 +9,16 @@
     <link rel="stylesheet" href="{{ static_url("lattice.css") }}" type="text/css">
   </head>
   <body>
-    <p><b>Python __repr__</b>: {{ lattice }}</p>
+    <p><b>Lattice: python __repr__</b>: {{ lattice }}</p>
 
     <div>
       <table>
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
           <tr>
             {% for col in range(lattice.coordinate_cardinalities[1]) %}
-              <td>
-                {{ lattice.cells[(row, col)] }}
+              {% set cell = lattice.cells[(row, col)] %}
+              <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
+                {{ cell }}
               </td>
             {% end %}
           </tr>

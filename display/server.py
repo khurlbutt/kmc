@@ -26,8 +26,13 @@ class PrintToyDisplayHandler(BaseDisplayHandler):
     def get(self, num_dummy_sites):
         num_dummy_sites = int(num_dummy_sites)
         try:
-            lattice = print_toys.get_dummy_lattice(num_dummy_sites)
-            self.render("lattice.html", lattice=lattice)
+            axis_lengths = (2, 2)
+            if num_dummy_sites == 3:
+                axis_lengths = (4, 4)
+            lattice = print_toys.get_dummy_lattice(
+                axis_lengths, num_dummy_sites)
+            self.render("lattice.html", lattice=lattice,
+                bgcolor_for_cell=print_toys.bgcolor_for_cell)
         except print_toys.PrintToysError as e:
             self.write("Could not print toy with %d dummy sites: %s" % (
                 num_dummy_sites, e))
