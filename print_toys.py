@@ -247,9 +247,34 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
         __update_lattice_cell(
             lattice, (0, 1), ["*_0", "*_1", "CO2", "CO2", "*_4"])
         __update_lattice_cell(
-            lattice, (1, 0), ["CO", "CO", "*_2", "*_3", "O2"])
+            lattice, (0, 2), ["*_0", "*_1", "CO2", "CO2", "*_4"])
+        __update_lattice_cell(
+            lattice, (0, 3), ["*_0", "*_1", "CO2", "*_3", "*_4"])
+        __update_lattice_cell(
+            lattice, (1, 0), ["*_0", "*_1", "*_2", "CO2", "O2"])
         __update_lattice_cell(
             lattice, (1, 1), ["CO", "CO", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (1, 2), ["CO", "CO", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (1, 3), ["*_0", "CO", "CO2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (2, 0), ["*_0", "CO", "*_2", "CO2", "O2"])
+        __update_lattice_cell(
+            lattice, (2, 1), ["CO", "CO", "*_2", "*_3", "*_4"])
+        __update_lattice_cell(
+            lattice, (2, 2), ["CO", "*_1", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (2, 3), ["CO", "*_1", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (3, 0), ["CO", "*_1", "*_2", "*_3", "*_4"])
+        __update_lattice_cell(
+            lattice, (3, 1), ["*_0", "CO", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (3, 2), ["*_0", "*_1", "*_2", "*_3", "O2"])
+        __update_lattice_cell(
+            lattice, (3, 3), ["*_0", "*_1", "*_2", "*_3", "O2"])
+
     else:
         # Exists a dist of "allowed" occupants, dependpent on cell's state.
         example_site_states = ["<draw_allowable(cell, site_%d)>" % index
@@ -284,7 +309,31 @@ def bgcolor_for_cell(cell):
         if states == ["X_bridge", "Y_bridge", "Z_hollow"]:
             return "darkorchid"
     elif len(states) == 5:
-            pass
+        if states == ["*_0", "*_1", "CO2", "CO2", "*_4"]:
+            return "crimson"
+        if (states == ["*_0", "*_1", "*_2", "CO2", "*_4"] or
+                states == ["*_0", "*_1", "CO2", "*_3", "*_4"]):
+            return "salmon"
+        if (states == ["*_0", "*_1", "CO2", "*_3", "O2"] or
+                states == ["*_0", "*_1", "*_2", "CO2", "O2"]):
+            return "yellow"
+        if states == ["CO", "CO", "*_2", "*_3", "*_4"]:
+            return "darkorange"
+        if (states == ["*_0", "CO", "CO2", "*_3", "O2"] or
+                states == ["*_0", "CO", "*_2", "CO2", "O2"] or
+                states == ["CO", "*_1", "CO2", "*_3", "O2"] or
+                states == ["CO", "*_1", "*_2", "CO2", "O2"]):
+            return "sandybrown"
+        if (states == ["CO", "*_1", "*_2", "*_3", "*_4"] or
+                states == ["*_0", "CO", "*_2", "*_3", "*_4"]):
+            return "orange"
+        if states == ["CO", "CO", "*_2", "*_3", "O2"]:
+            return "aquamarine"
+        if (states == ["CO", "*_1", "*_2", "*_3", "O2"] or
+                states == ["*_0", "CO", "*_2", "*_3", "O2"]):
+            return "lightgreen"
+        if states == ["*_0", "*_1", "*_2", "*_3", "O2"]:
+            return "limegreen"
 
     return "white"
 

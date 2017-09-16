@@ -27,7 +27,7 @@ class PrintToyDisplayHandler(BaseDisplayHandler):
         num_dummy_sites = int(num_dummy_sites)
         try:
             axis_lengths = (2, 2)
-            if num_dummy_sites == 3:
+            if num_dummy_sites > 2:
                 axis_lengths = (4, 4)
             lattice = print_toys.get_dummy_lattice(
                 axis_lengths, num_dummy_sites)
