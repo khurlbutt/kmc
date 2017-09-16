@@ -16,7 +16,7 @@ class EnabledCollection(object):
         # http://www.grantjenks.com/docs/sortedcontainers/sortedlistwithkey.html
         # IMHO this will do for early iterating; we could build our own, but
         # honestly this is likely more performant. As a plus, it's pythonic AF.
-        assert key_fn, "Need callable for sorted process queue."
+        assert callable(key_fn), "Need callable for sorted process queue."
         self._queue = sortedcontainers.SortedListWithKey(key=key_fn)
 
     def add(self, process):

@@ -4,7 +4,7 @@ class Process(object):
 
     def __init__(self, enabled_step, transition_by_site):
         assert isinstance(enabled_step, int)
-        assert isinstance(transition_by_site, dict)
+        assert isinstance(transition_by_site, dict) and transition_by_site
 
         self.enabled_step = enabled_step
         self.occurence_time = None

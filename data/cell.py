@@ -1,11 +1,16 @@
+import data.lattice
 
 
 class Cell(object):
 
     def __init__(self, lattice, coordinates):
-        assert lattice and lattice.coordinate_cardinalities
+        assert isinstance(lattice, data.lattice.Lattice)
+        assert isinstance(lattice.coordinate_cardinalities, tuple)
+        assert lattice.coordinate_cardinalities
         num_sites = lattice.coordinate_cardinalities[-1]
         assert isinstance(num_sites, int) and num_sites > 0
+        assert coordinates
+        assert len(coordinates) == len(lattice.coordinate_cardinalities)
 
         self.coordinates = tuple(coordinates)  # eg (x, y)
         sites_coordinates = [self.coordinates + (index, )
