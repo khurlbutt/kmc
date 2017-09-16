@@ -10,7 +10,8 @@ class Cell(object):
         num_sites = lattice.coordinate_cardinalities[-1]
         assert isinstance(num_sites, int) and num_sites > 0
         assert coordinates
-        assert len(coordinates) == len(lattice.coordinate_cardinalities)
+        print((coordinates, lattice.coordinate_cardinalities))
+        assert len(coordinates) == len(lattice.coordinate_cardinalities) - 1
 
         self.coordinates = tuple(coordinates)  # eg (x, y)
         sites_coordinates = [self.coordinates + (index, )
