@@ -12,9 +12,9 @@
 
     <div>
       <table>
-        {% for row in range(lattice.coordinante_cardinalites[0]) %}
+        {% for row in range(lattice.coordinate_cardinalities[0]) %}
           <tr>
-            {% for col in range(lattice.coordinante_cardinalites[1]) %}
+            {% for col in range(lattice.coordinate_cardinalities[1]) %}
               <td>
                 {{ lattice.cells[(row, col)] }}
               </td>
