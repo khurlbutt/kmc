@@ -263,7 +263,7 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
         __update_lattice_cell(
             lattice, (2, 1), ["CO", "CO", "*_2", "*_3", "*_4"])
         __update_lattice_cell(
-            lattice, (2, 2), ["CO", "*_1", "*_2", "*_3", "O2"])
+            lattice, (2, 2), ["*_0", "CO", "*_2", "*_3", "O2"])
         __update_lattice_cell(
             lattice, (2, 3), ["CO", "*_1", "*_2", "*_3", "O2"])
         __update_lattice_cell(
