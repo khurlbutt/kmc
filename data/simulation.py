@@ -67,7 +67,9 @@ class Simulation(object):
     def _find_enabled_processes(self, site):
         # Only for /print-toys/{1, 2}
         # BELOW ARE TOY CASES... FOR NOW
+        # Move imports to top once done iterating...
         if self.lattice.sites_per_cell == 1:
+            import settings.elem_rxns_configs.v3.toy_A as toy1_config
             if site.state == "A":
                 after = "*_0"
             elif site.state == "*_0":
