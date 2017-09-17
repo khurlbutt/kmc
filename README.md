@@ -9,6 +9,7 @@ Simply run the following
 
 Run the display server in the background.
 * python display/server.py
+
 Visit localhost:8888 in your browser.
 * Going through the toy examples in order will give you a gist
 * Start with localhost:8888/print-toy/1
