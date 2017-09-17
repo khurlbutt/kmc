@@ -81,9 +81,13 @@ def simulate(lattice, stop_step=None):
     if lattice.sites_per_cell == 1:
         if lattice.coordinate_cardinalities[0:1] != (10, 10):
             lattice = data.lattice.Lattice()
+    elif lattice.sites_per_cell == 2:
+        if lattice.coordinate_cardinalities[0:1] != (10, 10):
+            lattice = data.lattice.Lattice(sites_per_cell=2)
     else:
         raise PrintToysError("Haven't built stop_step for this toy... yet!")
-    simulation = data.simulation.Simulation(stop_step=stop_step)
+    simulation = data.simulation.Simulation(
+        lattice=lattice, stop_step=stop_step)
     simulation.run()
     return simulation.lattice
 

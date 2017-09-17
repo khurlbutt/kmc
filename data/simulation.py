@@ -65,11 +65,25 @@ class Simulation(object):
             self.process_queue.add(process)
 
     def _find_enabled_processes(self, site):
-        # Only for /print-toys/1
-        if site.state == "A":
-            after = "*_0"
-        elif site.state == "*_0":
-            after = "A"
+        # Only for /print-toys/{1, 2}
+        # BELOW ARE TOY CASES... FOR NOW
+        if self.lattice.sites_per_cell == 1:
+            if site.state == "A":
+                after = "*_0"
+            elif site.state == "*_0":
+                after = "A"
+        elif self.lattice.sites_per_cell == 2:
+            site_index = site.coordinates[-1]
+            if site_index == 0:
+                if site.state == "*_0":
+                    after = "O2"
+                elif site.state == "O2":
+                    after = "*_0"
+            elif site_index == 1:
+                if site.state == "*_1":
+                    after = "CO"
+                elif site.state == "CO":
+                    after = "*_1"
         else:
             raise NotImplementedError
         return set([
