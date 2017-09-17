@@ -3,8 +3,6 @@ Kinetic Monte Carlo Simulation
 
 ## Setup
 Requires python 3.5.2 and pip.
-
-Simply run the following
 * pip install -r requirements.txt
 
 Run the display server in the background.
