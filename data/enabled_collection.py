@@ -31,7 +31,20 @@ class EnabledCollection(object):
                 raise e
             return None
 
+    def clear(self):
+        self._queue.clear()
+
+    def peek(self):
+        process = self.pop()
+        if process:
+            self.add(process)
+        return process
+
+    def __len__(self):
+        return len(self._queue)
+
     def __repr__(self):
-        return "%d process%s, %r" % (
-            len(self._queue), "es" if len(self._queue) != 1 else "", self._queue
+        return "%d process%s,peek:%r" % (
+            len(self._queue), "es" if len(self._queue) != 1 else "",
+            self.peek()
         )
