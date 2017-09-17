@@ -1,0 +1,66 @@
+# elem_rxns_config V1
+
+# A version of the elementary reactions'
+# config, as inputted by the user.
+
+# V1 fields
+# name: string
+# rate_constant: numerical, int for now... maybe float
+# changes: dict, mapping of cell to sites changes on that cell
+#    note: holes are explicitly indexed by "sites"
+#    eg  {cell: {sites: (before, after)}
+#        {(0, 0): {(0,): ("*", "A")}}
+#    note: sites is a tuple, since potentially more than one site can do change
+#    eg  {(0, 0): {(0, 1): ("CO", "*")}}
+
+{
+    "name": "oxygen adsorption",
+    "rate_constant": 1e10,
+    "changes": {
+        (0, 0): {(0, ): ("*", "O")},
+        (1, 1): {(0, ): ("*", "O")}
+    }
+}
+
+{
+    "name": "oxygen desorption",
+    "rate_constant": 1e5,
+    "changes": {
+        (0, 0): {(0, ): ("O", "*")},
+        (1, 1): {(0, ): ("O", "*")}
+    }
+}
+
+{
+    "name": "carbon monoxide adsorption",
+    "rate_constant": 1e9,
+    "changes": {
+        (0, 0): {(1, 2): ("*", "CO")}
+    }
+}
+
+{
+    "name": "carbon monoxide desorption",
+    "rate_constant": 1e8,
+    "changes": {
+        (0, 0): {(1, 2): ("CO", "*")}
+    }
+}
+
+{
+    "name": "carbon dioxide formation",
+    "rate_constant": 1e3,
+    "changes": {
+        (0, 0): {(0, ): ("O", "*")},
+        (1, 1): {(1, 2): ("CO", "*")}
+    }
+}
+
+{
+    "name": "carbon dioxide adsorption",
+    "rate_constant": 1e-2,
+    "changes": {
+        (0, 0): {(0, ): ("*", "O")},
+        (1, 1): {(1, 2): ("*", "CO")}
+    }
+}

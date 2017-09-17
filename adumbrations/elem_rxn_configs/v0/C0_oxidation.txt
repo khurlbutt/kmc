@@ -1,3 +1,5 @@
+# elem_rxns_config V0
+
 # A version of the elementary reactions'
 # config, as input by the user.
 
