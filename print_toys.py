@@ -195,7 +195,7 @@ def _populate_dummy_process(lattice, num_sites):
     sim_step = 1  # Whatever for now.
     current_time = 7  # Whatever for now.
     process = data.process.Process(sim_step, transition_by_site)
-    process.generate_occurence_time(current_time)
+    process.generate_occurence_usec(current_time)
     return process
 
 

@@ -24,7 +24,7 @@ class Simulation(object):
             next_process = self.process_queue.pop()
             if next_process.is_still_performable(self.lattice):
                 self.step += 1
-                self.time = next_process.occurence_time
+                self.time = next_process.occurence_usec
                 next_process.perform(self.lattice)
                 self._update_process_queue(next_process.sites)
 
@@ -42,7 +42,7 @@ class Simulation(object):
         for site in sites:
             newly_enabled_processes.update(self._find_enabled_processes(site))
         for process in newly_enabled_processes:
-            process.generate_occurence_time(self.time)
+            process.generate_occurence_usec(self.time)
             self.process_queue.add(process)
 
     def _find_enabled_processes(self, site):
