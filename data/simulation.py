@@ -7,10 +7,12 @@ class Simulation(object):
 
     def __init__(self):
         self.STOP_TIME = -1
-        self.STOP_STEP = 100
+        self.STOP_STEP = 1000
 
-        self.time = int(0)  # Keep as an int or long, either usec or nsec etc.
+        self.time_usec = 0  # Keep as an int or long, either usec or nsec etc.
         self.step = 0
+        self.lattice = None
+        self.process_queue = None
         self._initialize_lattice()
         self._initialize_process_queue()
 
@@ -18,15 +20,22 @@ class Simulation(object):
         # Draw a process, perform if possible, add new enabled processes.
         # (Repeat above)
 
-    def run(self):
+    def run(self, interactive=False):
         while self._continue_sim():
             # What would it mean if this popped None (was empty)?
             next_process = self.process_queue.pop()
             if next_process.is_still_performable(self.lattice):
                 self.step += 1
-                self.time = next_process.occurence_usec
+                self.time_usec = int(next_process.occurence_usec)
                 next_process.perform(self.lattice)
-                self._update_process_queue(next_process.sites)
+                self.update_process_queue(next_process.sites_coordinates)
+                if interactive:
+                    cin = input(">>>")
+                    if cin == "exit":
+                        print(self)
+                        print("EXITING")
+                        break
+                    print(self)
 
     def _initialize_lattice(self):
         self.lattice = data.lattice.Lattice()
@@ -34,15 +43,23 @@ class Simulation(object):
     def _initialize_process_queue(self):
         self.process_queue = data.enabled_collection.EnabledCollection(
             key_fn=data.process.Process.key_fn)
-        self.update_process_queue(self.lattice.iter_sites())
+        self.update_process_queue([], from_scratch=True)
 
-    def update_process_queue(self, sites):
+    def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
-        # Times not generated, avoid enqueuing the same process more than once.
-        for site in sites:
-            newly_enabled_processes.update(self._find_enabled_processes(site))
+        if from_scratch:
+            assert not sites_coordinates
+            self.process_queue.clear()
+            for site in self.lattice.iter_sites():
+                newly_enabled_processes.update(
+                    self._find_enabled_processes(site))
+        else:
+            for sites_coordinates in sites_coordinates:
+                site = self.lattice.sites[sites_coordinates]
+                newly_enabled_processes.update(
+                    self._find_enabled_processes(site))
         for process in newly_enabled_processes:
-            process.generate_occurence_usec(self.time)
+            process.generate_occurence_usec(self.time_usec)
             self.process_queue.add(process)
 
     def _find_enabled_processes(self, site):
@@ -51,6 +68,8 @@ class Simulation(object):
             after = "*_0"
         elif site.state == "*_0":
             after = "A"
+        else:
+            raise NotImplementedError
         return set([
             data.process.Process(
                 self.step, {site.coordinates: (site.state, after)}),
@@ -59,10 +78,10 @@ class Simulation(object):
     def _continue_sim(self):
         # TODO include more flexibility on stop conditions
         if self.STOP_TIME > 0:
-            return self.STOP_TIME > self.time
+            return self.STOP_TIME > self.time_usec
         else:
             return self.STOP_STEP > self.step
 
     def __repr__(self):
-        return "t=%d\nLattice:%r\nEnabledCollection:%r" % (
-            self.time, self.lattice, self.process_queue)
+        return "s=%d\nt=%d\nLattice:%r\nEnabledCollection:%r" % (
+            self.step, self.time_usec, self.lattice, self.process_queue)

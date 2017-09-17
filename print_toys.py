@@ -70,6 +70,11 @@ def simulation_examples():
     print("%r\n\n" % simulation)
 
 
+def simulation_interactive(num_sites=1):
+    simulation = data.simulation.Simulation()
+    simulation.run(interactive=True)
+
+
 def enabled_collection_examples():
     key_fn = data.process.Process.key_fn
     ec = data.enabled_collection.EnabledCollection(key_fn=key_fn)
@@ -193,9 +198,9 @@ def _populate_dummy_process(lattice, num_sites):
         assert (starting_site == ending_site) or valid_site_change
 
     sim_step = 1  # Whatever for now.
-    current_time = 7  # Whatever for now.
+    current_usec = 7  # Whatever for now.
     process = data.process.Process(sim_step, transition_by_site)
-    process.generate_occurence_usec(current_time)
+    process.generate_occurence_usec(current_usec)
     return process
 
 

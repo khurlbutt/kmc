@@ -14,7 +14,8 @@
     <br/>
     <br/>
 
-    <p><b>simplified comma cells</b><i> (holes unindexed, e.g. *)</i></p>
+    <p><b>simplified comma cells</b>
+    <i>(holes unindexed, i.e. * = empty)</i></p>
     <div>
       <table>
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
@@ -35,7 +36,8 @@
     <br/>
     <br/>
 
-    <p><b>python __repr__ cells</b><i> (holes indexed, e.g. *_0)</i></p>
+    <p><b>python __repr__ cells</b>
+    <i>(holes indexed, i.e. *_0 = empty at site zero)</i></p>
     <div>
       <table>
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
