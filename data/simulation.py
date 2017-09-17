@@ -28,7 +28,7 @@ class Simulation(object):
             if next_process.is_still_performable(self.lattice):
                 self.step += 1
                 self.time_usec = int(next_process.occurence_usec)
-                next_process.perform(self.lattice)
+                next_process.perform(self.step, self.lattice)
                 self.update_process_queue(next_process.sites_coordinates)
                 if interactive:
                     cin = input(">>>")

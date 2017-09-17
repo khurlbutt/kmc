@@ -24,12 +24,12 @@ class Process(object):
         import random
         self.occurence_usec = current_usec + (random.random() * 1e6)
 
-    def perform(self, lattice):
+    def perform(self, step, lattice):
         if not self.is_still_performable(lattice):
             raise LatticeProcessException("Not performable")
         for site_coordinates, transition in self.transition_by_site.items():
             after_adsorbate = transition[1]
-            lattice.sites[site_coordinates].state = after_adsorbate
+            lattice.sites[site_coordinates].transition(step, after_adsorbate)
 
     def is_still_performable(self, lattice):
         for site_coordinates, transition in self.transition_by_site.items():

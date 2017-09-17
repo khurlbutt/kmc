@@ -58,7 +58,8 @@ def process_examples():
             print("before...")
             print("\tSites:\n\t%r" % __current_sites_states(lattice, process))
             print("\tLattice:\n\t%r" % lattice)
-            process.perform(lattice)
+            step = 0
+            process.perform(step, lattice)
             print("\nafter...")
             print("\tSites:\n\t%r" % __current_sites_states(lattice, process))
             print("\tLattice:\n\t%r" % lattice)
@@ -225,7 +226,8 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
     def __update_lattice_cell(lattice, cell_coordinates, new_states):
         for index, state in enumerate(new_states):
             site_coordinates = cell_coordinates + (index,)
-            lattice.sites[site_coordinates].state = state
+            step = 0
+            lattice.sites[site_coordinates].transition(step, state)
 
     lattice = data.lattice.Lattice(
         axis_lengths=axis_lengths, sites_per_cell=num_sites)
