@@ -25,10 +25,10 @@ class HomeDisplayHandler(BaseDisplayHandler):
 class PrintToyDisplayHandler(BaseDisplayHandler):
     def get(self, num_dummy_sites):
         num_dummy_sites = int(num_dummy_sites)
+        axis_lengths = (2, 2)
+        if num_dummy_sites > 2:
+            axis_lengths = (4, 4)
         try:
-            axis_lengths = (2, 2)
-            if num_dummy_sites > 2:
-                axis_lengths = (4, 4)
             lattice = print_toys.get_dummy_lattice(
                 axis_lengths, num_dummy_sites)
             self.render("print_toys.html", lattice=lattice,
