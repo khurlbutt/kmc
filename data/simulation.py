@@ -5,13 +5,14 @@ import data.process
 
 class Simulation(object):
 
-    def __init__(self):
+    def __init__(self, stop_step=None, lattice=None):
         self.STOP_TIME = -1
-        self.STOP_STEP = 1000
+        self.STOP_STEP = stop_step or 1000
 
         self.time_usec = 0  # Keep as an int or long, either usec or nsec etc.
         self.step = 0
-        self.lattice = None
+        self.lattice = (
+            lattice if isinstance(lattice, data.lattice.Lattice) else None)
         self.process_queue = None
         self._initialize_lattice()
         self._initialize_process_queue()
@@ -38,7 +39,8 @@ class Simulation(object):
                     print(self)
 
     def _initialize_lattice(self):
-        self.lattice = data.lattice.Lattice()
+        if self.lattice is None:
+            self.lattice = data.lattice.Lattice()
 
     def _initialize_process_queue(self):
         self.process_queue = data.enabled_collection.EnabledCollection(

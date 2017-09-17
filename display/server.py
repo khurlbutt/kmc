@@ -31,6 +31,10 @@ class PrintToyDisplayHandler(BaseDisplayHandler):
         try:
             lattice = print_toys.get_dummy_lattice(
                 axis_lengths, num_dummy_sites)
+            stop_step = int(self.get_argument("stop_step", 0))
+            if stop_step:
+                lattice = print_toys.simulate(
+                    lattice=lattice, stop_step=stop_step)
             self.render("print_toys.html", lattice=lattice,
                 bgcolor_for_cell=print_toys.bgcolor_for_cell)
         except print_toys.PrintToysError as e:

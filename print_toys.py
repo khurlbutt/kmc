@@ -75,6 +75,19 @@ def simulation_interactive(num_sites=1):
     simulation.run(interactive=True)
 
 
+def simulate(lattice, stop_step=None):
+    if not stop_step:
+        raise PrintToysError("Need stop step to simulate to.")
+    if lattice.sites_per_cell == 1:
+        if lattice.coordinate_cardinalities[0:1] != (10, 10):
+            lattice = data.lattice.Lattice()
+    else:
+        raise PrintToysError("Haven't built stop_step for this toy... yet!")
+    simulation = data.simulation.Simulation(stop_step=stop_step)
+    simulation.run()
+    return simulation.lattice
+
+
 def enabled_collection_examples():
     key_fn = data.process.Process.key_fn
     ec = data.enabled_collection.EnabledCollection(key_fn=key_fn)
