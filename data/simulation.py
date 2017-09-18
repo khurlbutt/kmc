@@ -38,15 +38,6 @@ class Simulation(object):
                         break
                     print(self)
 
-    def _initialize_lattice(self):
-        if self.lattice is None:
-            self.lattice = data.lattice.Lattice()
-
-    def _initialize_process_queue(self):
-        self.process_queue = data.enabled_collection.EnabledCollection(
-            key_fn=data.process.Process.key_fn)
-        self.update_process_queue([], from_scratch=True)
-
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
         if from_scratch:
@@ -64,12 +55,21 @@ class Simulation(object):
             process.generate_occurence_usec(self.time_usec)
             self.process_queue.add(process)
 
+    def _initialize_lattice(self):
+        if self.lattice is None:
+            self.lattice = data.lattice.Lattice()
+
+    def _initialize_process_queue(self):
+        self.process_queue = data.enabled_collection.EnabledCollection(
+            key_fn=data.process.Process.key_fn)
+        self.update_process_queue([], from_scratch=True)
+
     def _find_enabled_processes(self, site):
         # Only for /print-toys/{1, 2}
         # BELOW ARE TOY CASES... FOR NOW
         # Move imports to top once done iterating...
         if self.lattice.sites_per_cell == 1:
-            import settings.elem_rxns_configs.v3.toy_A as toy1_config
+            # import settings.elem_rxns_configs.v3.toy_A as toy1_config
             if site.state == "A":
                 after = "*_0"
             elif site.state == "*_0":
