@@ -57,7 +57,7 @@ class Simulation(object):
                     self._find_enabled_processes(site))
         else:
             for sites_coordinates in sites_coordinates:
-                site = self.lattice.sites[sites_coordinates]
+                site = self.lattice[sites_coordinates]
                 newly_enabled_processes.update(
                     self._find_enabled_processes(site))
         for process in newly_enabled_processes:

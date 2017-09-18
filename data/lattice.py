@@ -17,7 +17,7 @@ class Lattice(object):
 
         empty_sites = [data.site.Site(coords, "*_%d" % coords[-1])
             for coords in coord_points]
-        self.sites = {site.coordinates: site for site in empty_sites}
+        self._sites = {site.coordinates: site for site in empty_sites}
 
         # Ends up storing all the site bookkeeping twice... here and on cells.
         cells_coordinates = set()
@@ -25,18 +25,57 @@ class Lattice(object):
             cells_coordinates.add(site.coordinates[:-1])
         empty_cells = [data.cell.Cell(self, cell_coordinates)
             for cell_coordinates in cells_coordinates]
-        self.cells = {cell.coordinates: cell for cell in empty_cells}
+        self._cells = {cell.coordinates: cell for cell in empty_cells}
 
     def iter_sites(self):
         # Example of a generator-iterator as described by PEP 255.
         # Intro to generators as "lazy evaluation" or "calculation on demand":
         #   http://intermediatepythonista.com/python-generators
-        for site_coordinates in sorted(self.sites):
-            yield self.sites[site_coordinates]
+        for site_coordinates in sorted(self._sites):
+            yield self._sites[site_coordinates]
 
     def iter_cells(self):
-        for cell_coordinates in sorted(self.cells):
-            yield self.cells[cell_coordinates]
+        for cell_coordinates in sorted(self._cells):
+            yield self._cells[cell_coordinates]
+
+    def __getitem__(self, key):
+        if not isinstance(key, tuple):
+            raise TypeError
+        site_coordinate_length = len(self.coordinate_cardinalities)
+        cell_coordinate_length = site_coordinate_length - 1
+        if (len(key) != site_coordinate_length and
+                len(key) != cell_coordinate_length):
+            raise IndexError(key)
+        normalized_key = self._normalize_coordinates(key)
+        if len(normalized_key) == site_coordinate_length:
+            return self._sites[normalized_key]
+        elif len(normalized_key) == cell_coordinate_length:
+            return self._cells[normalized_key]
+        else:
+            raise IndexError(key)
+
+    def _normalize_coordinates(self, coordinates):
+        # TODO make sure we're following periodic boundary condition rules
+        normalized_coordinates = []
+        for index, coordinate in enumerate(coordinates):
+            cardinality = self.coordinate_cardinalities[index]
+            # No 'wrap-around' for site indices, raise IndexError instead.
+            is_site_index = bool(index == len(coordinates) - 1)
+            # Never reach yourself(?)
+            if abs(coordinate) >= cardinality * 1.5:
+                raise IndexError(coordinates)
+            if coordinate < 0:
+                if is_site_index:
+                    raise IndexError(coordinates)
+                normalized = cardinality - abs(coordinate)
+            elif coordinate > (cardinality - 1):
+                if is_site_index:
+                    raise IndexError(coordinates)
+                normalized = coordinate - cardinality
+            else:
+                normalized = coordinate
+            normalized_coordinates.append(normalized)
+        return tuple(normalized_coordinates)
 
     def __repr__(self):
         species_counts = {}

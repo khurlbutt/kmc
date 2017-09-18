@@ -21,7 +21,7 @@
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
           <tr>
             {% for col in range(lattice.coordinate_cardinalities[1]) %}
-              {% set cell = lattice.cells[(row, col)] %}
+              {% set cell = lattice[(row, col)] %}
               {% set states = list(cell.site_states()) %}
               {% set simplified_states = [site.split("_")[0] if "_" in site else site for site in states] %}
               <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
@@ -43,7 +43,7 @@
         {% for row in range(lattice.coordinate_cardinalities[0]) %}
           <tr>
             {% for col in range(lattice.coordinate_cardinalities[1]) %}
-              {% set cell = lattice.cells[(row, col)] %}
+              {% set cell = lattice[(row, col)] %}
               <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
                 {{ cell }}
               </td>

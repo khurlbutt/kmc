@@ -15,7 +15,7 @@ class Cell(object):
         self.coordinates = tuple(coordinates)  # eg (x, y)
         sites_coordinates = [self.coordinates + (index, )
             for index in range(num_sites)]
-        self.sites = {site_coordinates: lattice.sites[site_coordinates]
+        self._sites = {site_coordinates: lattice[site_coordinates]
             for site_coordinates in sites_coordinates}
 
     def site_states(self):
@@ -23,8 +23,8 @@ class Cell(object):
             yield site.state
 
     def __iter__(self):
-        for site_coordinates in sorted(self.sites):
-            yield self.sites[site_coordinates]
+        for site_coordinates in sorted(self._sites):
+            yield self._sites[site_coordinates]
 
     def __repr__(self):
         return "%r,%r" % (self.coordinates, list(self.site_states()))

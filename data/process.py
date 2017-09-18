@@ -29,11 +29,11 @@ class Process(object):
             raise LatticeProcessException("Not performable")
         for site_coordinates, transition in self.transition_by_site.items():
             after_adsorbate = transition[1]
-            lattice.sites[site_coordinates].transition(step, after_adsorbate)
+            lattice[site_coordinates].transition(step, after_adsorbate)
 
     def is_still_performable(self, lattice):
         for site_coordinates, transition in self.transition_by_site.items():
-            site = lattice.sites[site_coordinates]
+            site = lattice[site_coordinates]
             before_adsorbate = transition[0]
             if self.enabled_step < site.last_update_step:
                 return False

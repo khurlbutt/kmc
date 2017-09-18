@@ -27,7 +27,7 @@ def process_examples():
     def __current_sites_states(lattice, process):
         sites = []
         for site_coordinates in sorted(process.transition_by_site.keys()):
-            sites.append(lattice.sites[site_coordinates])
+            sites.append(lattice[site_coordinates])
         return sites
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         lattice = _populate_dummy_lattice(num_sites)
@@ -129,7 +129,7 @@ def _populate_dummy_process(lattice, num_sites):
     if num_sites == 1:
         starting = ["A"]
         ending = ["*_0"]
-        toy_cell = lattice.cells[(0, 0)]
+        toy_cell = lattice[(0, 0)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {
             (0, 0, 0): (starting[0], ending[0]),
@@ -142,7 +142,7 @@ def _populate_dummy_process(lattice, num_sites):
     elif num_sites == 2:
         starting = ["*_0", "CO"]
         ending = ["O2", "CO"]
-        toy_cell = lattice.cells[(0, 1)]
+        toy_cell = lattice[(0, 1)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {
             (0, 1, 0): (starting[0], ending[0]),
@@ -157,7 +157,7 @@ def _populate_dummy_process(lattice, num_sites):
     elif num_sites == 3:
         starting = ["X_bridge", "*_1", "Z_hollow"]
         ending = ["*_0", "Y_bridge", "Z_hollow"]
-        toy_cell = lattice.cells[(2, 1)]
+        toy_cell = lattice[(2, 1)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {
             (2, 1, 0): (starting[0], ending[0]),
@@ -175,7 +175,7 @@ def _populate_dummy_process(lattice, num_sites):
     elif num_sites == 5:
         starting = ["*_0", "*_1", "CO2", "CO2", "*_4"]
         ending = ["CO", "CO", "*_2", "*_3", "O2"]
-        toy_cell = lattice.cells[(0, 1)]
+        toy_cell = lattice[(0, 1)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {
             (0, 1, 0): (starting[0], ending[0]),
@@ -206,7 +206,7 @@ def _populate_dummy_process(lattice, num_sites):
             possible_changes[hole_for_index] = species
             starting.append(hole_for_index)
             ending.append(species)
-        toy_cell = lattice.cells[(0, 1)]
+        toy_cell = lattice[(0, 1)]
         assert list(toy_cell.site_states()) == starting
         transition_by_site = {(0, 1, index): (starting[index], ending[index])
             for index in range(num_sites)}
@@ -227,7 +227,7 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
         for index, state in enumerate(new_states):
             site_coordinates = cell_coordinates + (index,)
             step = 0
-            lattice.sites[site_coordinates].transition(step, state)
+            lattice[site_coordinates].transition(step, state)
 
     lattice = data.lattice.Lattice(
         axis_lengths=axis_lengths, sites_per_cell=num_sites)
