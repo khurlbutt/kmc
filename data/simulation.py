@@ -14,8 +14,10 @@ class Simulation(object):
         self.lattice = (
             lattice if isinstance(lattice, data.lattice.Lattice) else None)
         self.process_queue = None
+        self.ELEM_RXNS = None
         self._initialize_lattice()
         self._initialize_process_queue()
+        self._initialize_elem_rxns()
 
         # Enable processes
         # Draw a process, perform if possible, add new enabled processes.
@@ -38,6 +40,24 @@ class Simulation(object):
                         break
                     print(self)
 
+<<<<<<< HEAD
+=======
+    def _initialize_lattice(self):
+        if self.lattice is None:
+            self.lattice = data.lattice.Lattice()
+
+    def _initialize_process_queue(self):
+        self.process_queue = data.enabled_collection.EnabledCollection(
+            key_fn=data.process.Process.key_fn)
+        self.update_process_queue([], from_scratch=True)
+
+    def _initialize_elem_rxns(self):
+        import settings.elem_rxns_configs.v4.toy_A as toy1_config
+        self.ELEM_RXNS = toy1_config.build_rxns_list()
+        print(self.ELEM_RXNS)
+
+
+>>>>>>> Adding the beginning of elementary steps. IN CREATO
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
         if from_scratch:

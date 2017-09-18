@@ -1,0 +1,69 @@
+# A version of the elementary reactions'
+# config, as input by the user.
+
+name = "oxygen adsorption"
+rate_constant = 1e10
+changes = {
+	(0,0,0): ("*_hol","O*_hol"),
+	(1,1,0): ("*_hol", "O*_hol")
+}
+
+name = "oxygen desorption"
+rate_constant = 1e5
+changes = {
+	(0,0,0): ("O*_hol","*_hol"),
+	(1,1,0): ("O*_hol", "*_hol")
+}
+
+name = "carbon monoxide adsorption"
+rate_constant = 1e9
+changes = {
+	(0,0,1): ("*_br","CO*_br")
+}
+
+name = "carbon monoxide adsorption"
+rate_constant = 1e9
+changes = {
+	(0,0,2): ("*_br","CO*_br")
+}
+
+name = "carbon monoxide desorption"
+rate_constant = 1e8
+changes = {
+	(0,0,1): ("CO*_br","*_br")
+}
+
+name = "carbon monoxide desorption"
+rate_constant = 1e8
+changes = {
+	(0,0,2): ("CO*_br","*_br")
+}
+
+name = "carbon dioxide formation"
+rate_constant = 1e3
+changes = {
+	(0,0,0): ("O*_hol","*_hol")
+	(1,1,1): ("CO*_br","*_br")
+}
+
+name = "carbon dioxide formation"
+rate_constant = 1e3
+changes = {
+	(0,0,0): ("O*_hol","*_hol")
+	(1,1,2): ("CO*_br","*_br")
+}
+
+name = "carbon dioxide adsorption"
+rate_constant = 1e-2
+changes = {
+	(0,0,0): ("*_hol","O*_hol")
+	(1,1,1): ("*_br","CO*_br")
+}
+
+name = "carbon dioxide adsorption"
+rate_constant = 1e-2
+changes = {
+	(0,0,0): ("*_hol","O*_hol")
+	(1,1,2): ("*_br","CO*_br")
+}
+	

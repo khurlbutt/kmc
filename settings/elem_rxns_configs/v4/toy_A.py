@@ -10,15 +10,14 @@
 #    note: holes are explicitly indexed by "sites"
 #    eg  {cell: {sites: (before, after)}
 #        {(0, 0): {(0,): ("*", "A")}}
-#    note: sites is a tuple, since potentially more than one site can do change.
-#          what's meant below is XOR, a case of AND should be distinct entries.
+#    note: sites is a tuple, since potentially more than one site can do change
 #    eg  {(0, 0): {(0, 1): ("CO", "*")}}
 
 adsorption = {
     "name": "toy adsorption",
     "rate_constant": 1e10,
     "changes": {
-        (0, 0): {(0, ): ("*", "A")},
+        (0, 0): ("*", "A"),
     }
 }
 
@@ -26,7 +25,7 @@ desorption = {
     "name": "toy desorption",
     "rate_constant": 1e10,
     "changes": {
-        (0, 0): {(0, ): ("A", "*")},
+        (0, 0): ("A", "*"),
     }
 }
 
@@ -35,10 +34,10 @@ ELEMENTARY_RXNS = [
     desorption
 ]
 
-def adjust_elem_rxn_spec(spec):
+def justify_elem_rxn_spec(spec):
     min_x = float("inf")
     min_y = float("inf")
-    for key in spec["changes"]:
+    for key in spec:
         x = key[0]
         if x<min_x:
             min_x = x
@@ -67,9 +66,20 @@ def generate_rotated_specs(spec):
 def build_rxns_list():
     result = []
     for rxn in ELEMENTARY_RXNS:
-        adjusted = adjust_elem_rxn_spec(rxn)
-        result.append(adjusted)
-        for rotated in generate_rotated_specs(adjusted):
-            result.append(adjusted)
+        justified = {}
+        for key in rxn:
+            justified[key] = rxn[key]
+        justified["changes"] = justify_elem_rxn_spec(justified["changes"])
+        result.append(justified)
+        rot_90=rot_180=rot_270 = {}
+        for key in justified:
+            rot_90[key]=rot_180[key]=rot_270[key] = justified[key]
+        rotated = generate_rotated_specs(justified["changes"])
+        rot_90 = rotated[0]
+        result.append(rot_90)
+        rot_180 = rotated[1]
+        result.append(rot_180)
+        rot_270 = rotated[2]
+        result.append(rot_270)
     return result
 
