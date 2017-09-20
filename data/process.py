@@ -22,7 +22,7 @@ class Process(object):
     def generate_occurence_usec(self, current_usec):
         # TODO...
         import random
-        self.occurence_usec = current_usec + (random.random() * 1e6)
+        self.occurence_usec = current_usec + int((random.random() * 1e6))
 
     def perform(self, step, lattice):
         if not self.is_still_performable(lattice):
