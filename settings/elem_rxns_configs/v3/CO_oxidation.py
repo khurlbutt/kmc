@@ -31,6 +31,7 @@ oxygen_desorption = {
     }
 }
 
+# SEE BELOW COMMENT
 carbon_monoxide_adsorption = {
     "name": "carbon monoxide adsorption",
     "rate_constant": 1e9,
@@ -39,6 +40,7 @@ carbon_monoxide_adsorption = {
     }
 }
 
+# SEE BELOW COMMENT
 carbon_monoxide_desorption = {
     "name": "carbon monoxide desorption",
     "rate_constant": 1e8,
@@ -47,6 +49,7 @@ carbon_monoxide_desorption = {
     }
 }
 
+# SEE BELOW COMMENT
 carbon_dioxide_formation = {
     "name": "carbon dioxide formation",
     "rate_constant": 1e3,
@@ -56,6 +59,9 @@ carbon_dioxide_formation = {
     }
 }
 
+# At (1, 1) what we mean is XOR.
+# There could be a case where AND is required,
+# but arguably such a case should be two distinct entries in "sites".
 carbon_dioxide_adsorption = {
     "name": "carbon dioxide adsorption",
     "rate_constant": 1e-2,
