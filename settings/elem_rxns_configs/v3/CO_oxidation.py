@@ -10,7 +10,8 @@
 #    note: holes are explicitly indexed by "sites"
 #    eg  {cell: {sites: (before, after)}
 #        {(0, 0): {(0,): ("*", "A")}}
-#    note: sites is a tuple, since potentially more than one site can do change
+#    note: sites is a tuple, since potentially more than one site can do change.
+#          what's meant below is XOR, a case of AND should be distinct entries.
 #    eg  {(0, 0): {(0, 1): ("CO", "*")}}
 
 oxygen_adsorption = {
