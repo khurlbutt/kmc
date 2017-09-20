@@ -31,7 +31,7 @@ class PrintToyDisplayHandler(BaseDisplayHandler):
         try:
             lattice = print_toys.get_dummy_lattice(
                 axis_lengths, num_dummy_sites)
-            stop_step = int(self.get_argument("stop_step", 0))
+            stop_step = int(self.get_query_argument("stop_step", 0))
             if stop_step:
                 lattice = print_toys.simulate(
                     lattice=lattice, stop_step=stop_step)
