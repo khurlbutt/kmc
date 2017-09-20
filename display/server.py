@@ -35,7 +35,7 @@ class PrintToyDisplayHandler(BaseDisplayHandler):
             if stop_step:
                 lattice = print_toys.simulate(
                     lattice=lattice, stop_step=stop_step)
-            self.render("print_toys.html", lattice=lattice,
+            self.render("print_toys/print_toy.html", lattice=lattice,
                 bgcolor_for_cell=print_toys.bgcolor_for_cell)
         except print_toys.PrintToysError as e:
             self.write("Could not print toy with %d dummy sites: %s" % (
