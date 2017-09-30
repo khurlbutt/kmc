@@ -35,22 +35,24 @@ ELEMENTARY_RXNS = [
     desorption
 ]
 
+
 def adjust_elem_rxn_spec(spec):
     min_x = float("inf")
     min_y = float("inf")
     for key in spec["changes"]:
         x = key[0]
-        if x<min_x:
+        if x < min_x:
             min_x = x
         y = key[1]
-        if y<min_y:
+        if y < min_y:
             min_y = y
     adjusted_spec = {}
     for key in spec:
         x = key[0]
         y = key[1]
-        adjusted_spec[(x-min_x, y-min_y)] = spec[key]
+        adjusted_spec[(x - min_x, y - min_y)] = spec[key]
     return adjusted_spec
+
 
 def generate_rotated_specs(spec):
     rot_90 = {}
@@ -64,6 +66,7 @@ def generate_rotated_specs(spec):
         rot_270[(-y, x)] = spec[key]
     return [rot_90, rot_180, rot_270]
 
+
 def build_rxns_list():
     result = []
     for rxn in ELEMENTARY_RXNS:
@@ -72,4 +75,3 @@ def build_rxns_list():
         for rotated in generate_rotated_specs(adjusted):
             result.append(adjusted)
     return result
-

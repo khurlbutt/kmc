@@ -40,8 +40,6 @@ class Simulation(object):
                         break
                     print(self)
 
-<<<<<<< HEAD
-=======
     def _initialize_lattice(self):
         if self.lattice is None:
             self.lattice = data.lattice.Lattice()
@@ -56,8 +54,6 @@ class Simulation(object):
         self.ELEM_RXNS = toy1_config.build_rxns_list()
         print(self.ELEM_RXNS)
 
-
->>>>>>> Adding the beginning of elementary steps. IN CREATO
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
         if from_scratch:
@@ -74,15 +70,6 @@ class Simulation(object):
         for process in newly_enabled_processes:
             process.generate_occurence_usec(self.time_usec)
             self.process_queue.add(process)
-
-    def _initialize_lattice(self):
-        if self.lattice is None:
-            self.lattice = data.lattice.Lattice()
-
-    def _initialize_process_queue(self):
-        self.process_queue = data.enabled_collection.EnabledCollection(
-            key_fn=data.process.Process.key_fn)
-        self.update_process_queue([], from_scratch=True)
 
     def _find_enabled_processes(self, site):
         # Only for /print-toys/{1, 2}
