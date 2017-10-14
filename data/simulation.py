@@ -52,7 +52,7 @@ class Simulation(object):
     def _initialize_elem_rxns(self):
         import settings.elem_rxns_configs.v4.toy_A as toy1_config
         self.ELEM_RXNS = toy1_config.build_rxns_list()
-        print(self.ELEM_RXNS)
+        # print(self.ELEM_RXNS)
 
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()

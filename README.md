@@ -2,6 +2,13 @@
 Kinetic Monte Carlo Simulation
 
 ## Setup
+Parts of the data model are stored using protobufs
+more info: https://github.com/google/protobuf/tree/master/python
+There's some brew/pip installs for the proto comiler (aka protoc).
+In essence, we want the kmc/proto/*.py files generally available for import.
+* chmod 700 proto/setup.sh
+* . proto/setup.sh
+
 Requires python 3.5.2 and pip.
 * pip install -r requirements.txt
 

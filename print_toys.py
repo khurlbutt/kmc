@@ -6,10 +6,11 @@ import data.simulation
 K_MAX_TOY_DUMMY_SITES = 5
 
 
-def get_dummy_lattice(axis_lengths, num_dummy_sites):
+def get_dummy_lattice(axis_lengths, num_dummy_sites, empty=False):
     if num_dummy_sites > K_MAX_TOY_DUMMY_SITES:
         raise PrintToysError("Too many dummy sites, no example defined.")
-    return _populate_dummy_lattice(num_dummy_sites, axis_lengths=axis_lengths)
+    return _populate_dummy_lattice(num_dummy_sites, axis_lengths=axis_lengths,
+        empty=empty)
 
 
 def lattice_examples():
@@ -77,13 +78,17 @@ def simulation_interactive(num_sites=1):
 
 
 def simulate(lattice, stop_step=None):
-    if not stop_step:
+    if stop_step is None:
         raise PrintToysError("Need stop step to simulate to.")
     if lattice.sites_per_cell == 1:
-        if lattice.coordinate_cardinalities[0:1] != (10, 10):
+        if lattice.coordinate_cardinalities[0:2] != (10, 10):
+            axis = lattice.coordinate_cardinalities[0:2]
+            print("Bad news, but shrugz for now: lattice axis: %r" % (
+                list(axis)))
             lattice = data.lattice.Lattice()
     elif lattice.sites_per_cell == 2:
-        if lattice.coordinate_cardinalities[0:1] != (10, 10):
+        if lattice.coordinate_cardinalities[0:2] != (10, 10):
+            print("Bad news, but shrugz for now.")
             lattice = data.lattice.Lattice(sites_per_cell=2)
     else:
         raise PrintToysError("Haven't built stop_step for this toy... yet!")
@@ -222,7 +227,7 @@ def _populate_dummy_process(lattice, num_sites):
     return process
 
 
-def _populate_dummy_lattice(num_sites, axis_lengths=None):
+def _populate_dummy_lattice(num_sites, axis_lengths=None, empty=False):
     def __update_lattice_cell(lattice, cell_coordinates, new_states):
         for index, state in enumerate(new_states):
             site_coordinates = cell_coordinates + (index,)
@@ -231,6 +236,9 @@ def _populate_dummy_lattice(num_sites, axis_lengths=None):
 
     lattice = data.lattice.Lattice(
         axis_lengths=axis_lengths, sites_per_cell=num_sites)
+    if empty:
+        return lattice
+
     if num_sites == 1:
         __update_lattice_cell(lattice, (0, 0), ["A"])
     elif num_sites == 2:

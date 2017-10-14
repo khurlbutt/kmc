@@ -1,0 +1,12 @@
+syntax = "proto2";
+
+package proto.lattice;
+
+import "proto/site.proto";
+
+message Lattice {
+  // Assumes finite cardinality, but can use radial coordinates.
+  repeated int64 axis_lengths = 1;
+  optional int64 sites_per_cell = 2;
+  repeated proto.site.Site sites = 3;
+}

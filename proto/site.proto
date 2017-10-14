@@ -1,0 +1,10 @@
+syntax = "proto2";
+
+package proto.site;
+
+message Site {
+  repeated int32 coordinates = 1;
+  // Adsorbate eg *_0 or C
+  optional string state = 2;
+  optional int64 last_update_step = 3;
+}

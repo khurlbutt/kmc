@@ -1,12 +1,14 @@
-import itertools
+import base64
 import data.cell
 import data.site
+import itertools
+import proto.lattice_pb2 as proto_lattice
 
 
 class Lattice(object):
 
     def __init__(self, *, axis_lengths=None, sites_per_cell=None):
-        axis_lengths = axis_lengths or (10, 10)
+        axis_lengths = tuple(axis_lengths) if axis_lengths else (10, 10)
         sites_per_cell = sites_per_cell or 1
 
         self.sites_per_cell = sites_per_cell
@@ -15,28 +17,41 @@ class Lattice(object):
         # Default to (x, y, s) here. But (r, theta, z) is equally chill.
         coord_points = list(itertools.product(*coord_sets))
 
-        empty_sites = [data.site.Site(coords, "*_%d" % coords[-1])
-            for coords in coord_points]
-        self._sites = {site.coordinates: site for site in empty_sites}
+        empty_sites = [
+            data.site.Site(coordinates=coords, state="*_%d" % coords[-1])
+            for coords in coord_points
+        ]
+        self._sites = self.set_sites(empty_sites)
 
         # Ends up storing all the site bookkeeping twice... here and on cells.
-        cells_coordinates = set()
-        for site in self.iter_sites():
-            cells_coordinates.add(site.coordinates[:-1])
-        empty_cells = [data.cell.Cell(self, cell_coordinates)
-            for cell_coordinates in cells_coordinates]
-        self._cells = {cell.coordinates: cell for cell in empty_cells}
+        self._cells = self.set_cells()
+
+    def set_sites(self, sites):
+        self._sites = {site.coordinates: site for site in sites}
+        return self._sites
 
     def iter_sites(self):
         # Example of a generator-iterator as described by PEP 255.
         # Intro to generators as "lazy evaluation" or "calculation on demand":
         #   http://intermediatepythonista.com/python-generators
-        for site_coordinates in sorted(self._sites):
-            yield self._sites[site_coordinates]
+        if self._sites:
+            for site_coordinates in sorted(self._sites):
+                yield self._sites[site_coordinates]
+
+    # Ends up storing all the site bookkeeping twice.
+    def set_cells(self):
+        cells_coordinates = set()
+        for site in self.iter_sites():
+            cells_coordinates.add(site.coordinates[:-1])
+        cells = [data.cell.Cell(self, cell_coordinates)
+            for cell_coordinates in cells_coordinates]
+        self._cells = {cell.coordinates: cell for cell in cells}
+        return self._cells
 
     def iter_cells(self):
-        for cell_coordinates in sorted(self._cells):
-            yield self._cells[cell_coordinates]
+        if self._cells:
+            for cell_coordinates in sorted(self._cells):
+                yield self._cells[cell_coordinates]
 
     def __getitem__(self, key):
         if not isinstance(key, tuple):
@@ -47,9 +62,9 @@ class Lattice(object):
                 len(key) != cell_coordinate_length):
             raise IndexError(key)
         normalized_key = self._normalize_coordinates(key)
-        if len(normalized_key) == site_coordinate_length:
+        if self._sites and len(normalized_key) == site_coordinate_length:
             return self._sites[normalized_key]
-        elif len(normalized_key) == cell_coordinate_length:
+        elif self._cells and len(normalized_key) == cell_coordinate_length:
             return self._cells[normalized_key]
         else:
             raise IndexError(key)
@@ -91,3 +106,44 @@ class Lattice(object):
         return "(%r){%r unique species: %r}" % (
             "x".join([str(c) for c in self.coordinate_cardinalities]),
             len(species_counts), sorted_distribution)
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto(lattice):
+    pb = proto_lattice.Lattice()
+    pb.axis_lengths.extend(list(lattice.coordinate_cardinalities[:-1]))
+    pb.sites_per_cell = lattice.sites_per_cell
+    pb.sites.extend([data.site.to_proto(site) for site in lattice.iter_sites()])
+    return pb
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto(pb):
+    lattice = Lattice(axis_lengths=list(pb.axis_lengths),
+        sites_per_cell=pb.sites_per_cell)
+    sites = []
+    for site_pb in pb.sites:
+        sites.append(data.site.from_proto(site_pb))
+    lattice.set_sites(sites)
+    lattice.set_cells()
+    return lattice
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto_b64str(lattice):
+    # Serialized bytes as a utf-8 encoded str.
+    return base64.b64encode(to_proto(lattice).SerializeToString())
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto_b64str(proto_b64str):
+    try:
+        import binascii
+        proto_str = base64.b64decode(proto_b64str)
+    except binascii.Error as e:
+        raise Exception("Not a valid base64-encoded protobuf.")
+    try:
+        pb = proto_lattice.Lattice.FromString(proto_str)
+    except TypeError as e:
+        raise Exception("Not a valid base64-encoded protobuf.")
+    return from_proto(pb)

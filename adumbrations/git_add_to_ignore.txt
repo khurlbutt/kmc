@@ -1,0 +1,1 @@
+counterintuitively, git add was necessary to finally ignore .*_pb2.py

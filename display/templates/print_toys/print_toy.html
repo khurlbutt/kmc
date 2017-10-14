@@ -1,4 +1,5 @@
 {% set lattice %}
+{% set serialized_lattice %}
 {% set bgcolor_for_cell %}
 
 <!DOCTYPE html>
@@ -9,9 +10,13 @@
     <link rel="stylesheet" href="{{ static_url("print_toys.css") }}" type="text/css">
   </head>
   <body>
-    <p><b>Lattice: python __repr__</b>: {{ lattice }}</p>
-
+    <h1>Lattice</h1>
+    {% module Template("print_toys/form_input.html", method="POST",
+                       serialized_lattice=serialized_lattice, input_title="Modify from Empty", input_keys=["stop_step"]) %}
+    {% module Template("print_toys/form_input.html", method="POST",
+                       serialized_lattice=serialized_lattice, input_title="Modify from Now", input_keys=["additional_steps"]) %}
     <br/>
+    <p><b>Lattice: python __repr__</b>: {{ lattice }}</p>
     <br/>
 
     <p><b>simplified comma cells</b>
