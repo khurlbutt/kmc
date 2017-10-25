@@ -1,0 +1,62 @@
+{% set lattice %}
+{% set serialized_lattice %}
+{% set bgcolor_for_cell %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Toy-{{ lattice.sites_per_cell }} Lattice</title>
+    <link rel="stylesheet" href="{{ static_url("print_toys.css") }}" type="text/css">
+  </head>
+  <body>
+    <h1>Lattice</h1>
+    {% module Template("print_toys/form_input.html", method="POST",
+                       serialized=serialized_lattice, input_title="Modify from Empty", input_keys=["stop_step"]) %}
+    {% module Template("print_toys/form_input.html", method="POST",
+                       serialized=serialized_lattice, input_title="Modify from Now", input_keys=["additional_steps"]) %}
+    <br/>
+    <p><b>Lattice: python __repr__</b>: {{ lattice }}</p>
+    <br/>
+
+    <p><b>simplified comma cells</b>
+    <i>(holes unindexed, i.e. * = empty)</i></p>
+    <div>
+      <table>
+        {% for row in range(lattice.coordinate_cardinalities[0]) %}
+          <tr>
+            {% for col in range(lattice.coordinate_cardinalities[1]) %}
+              {% set cell = lattice[(row, col)] %}
+              {% set states = list(cell.site_states()) %}
+              {% set simplified_states = [site.split("_")[0] if "_" in site else site for site in states] %}
+              <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
+                {{ ",".join(simplified_states) }}
+              </td>
+            {% end %}
+          </tr>
+        {% end %}
+      </table>
+    </div>
+
+    <br/>
+    <br/>
+
+    <p><b>python __repr__ cells</b>
+    <i>(holes indexed, i.e. *_0 = empty at site zero)</i></p>
+    <div>
+      <table>
+        {% for row in range(lattice.coordinate_cardinalities[0]) %}
+          <tr>
+            {% for col in range(lattice.coordinate_cardinalities[1]) %}
+              {% set cell = lattice[(row, col)] %}
+              <td bgcolor="{{ bgcolor_for_cell(cell) }}"}} }}">
+                {{ cell }}
+              </td>
+            {% end %}
+          </tr>
+        {% end %}
+      </table>
+    </div>
+
+  </body>
+</html>

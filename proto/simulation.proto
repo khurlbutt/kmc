@@ -1,0 +1,17 @@
+syntax = "proto2";
+
+package proto.simulation;
+
+import "proto/lattice.proto";
+import "proto/enabled_collection.proto";
+import "proto/elementary_reaction.proto";
+
+message Simulation {
+  optional int64 stop_time = 1;
+  optional int64 stop_step = 2;
+  optional int64 time_usec = 3;
+  optional int64 step = 4;
+  optional proto.lattice.Lattice lattice = 5;
+  optional proto.enabled_collection.EnabledCollection process_queue = 6;
+  repeated proto.elementary_reaction.ElementaryReaction elem_rxns = 7;
+}

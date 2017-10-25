@@ -5,6 +5,7 @@ This class defines an elementary step for a chemical reaction catalyzed on a
 metal surface.
 """
 
+
 class ElementaryStep():
     """docstring for ElementaryStep"""
     def __init__(self, name=None, k=1.0, E=None, definition=None):
@@ -48,3 +49,23 @@ class ElementaryStep():
 
     def arrhenius(self, dE, prefactor=1e13):
         pass
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto(elem_rxn):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto(pb):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto_b64str(elem_rxn):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto_b64str(proto_b64str):
+    raise NotImplementedError()

@@ -1,13 +1,16 @@
+import base64
 import data.enabled_collection
 import data.lattice
 import data.process
+
+import proto.simulation_pb2 as proto_simulation
 
 
 class Simulation(object):
 
     def __init__(self, stop_step=None, lattice=None):
+        self.STOP_STEP = stop_step or 1000  # Fix. Fail fast.
         self.STOP_TIME = -1
-        self.STOP_STEP = stop_step or 1000
 
         self.time_usec = 0  # Keep as an int or long, either usec or nsec etc.
         self.step = 0
@@ -110,3 +113,51 @@ class Simulation(object):
     def __repr__(self):
         return "s=%d\nt=%d\nLattice:%r\nEnabledCollection:%r" % (
             self.step, self.time_usec, self.lattice, self.process_queue)
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto(simulation):
+    lattice_pb = data.lattice.to_proto(simulation.lattice)
+    pb = proto_simulation.Simulation(lattice=lattice_pb)
+    pb.stop_time = simulation.STOP_TIME
+    pb.stop_step = simulation.STOP_STEP
+    pb.time_usec = simulation.time_usec
+    pb.step = simulation.step
+    # pb.enabled_collection = (
+    #     data.enabled_collection.to_proto(simulation.process_queue))
+    # pg.elementary_reaction = (
+    #     data.elementary_reaction.to_proto(simulation.ELEM_RXNS))
+    return pb
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto(pb):
+    simulation = Simulation(stop_step=pb.stop_step, lattice=pb.lattice)
+    simulation.STOP_TIME = pb.stop_time
+    simulation.STOP_STEP = pb.stop_step
+    simulation.time_usec = pb.time_usec
+    simulation.step = pb.step
+    simulation.lattice = data.lattice.from_proto(pb.lattice)
+    simulation.enabled_collection = pb.process_queue
+    simulation.ELEM_RXNS = pb.elem_rxns
+    return simulation
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto_b64str(simulation):
+    # Serialized bytes as a utf-8 encoded str.
+    return base64.b64encode(to_proto(simulation).SerializeToString())
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto_b64str(proto_b64str):
+    try:
+        import binascii
+        proto_str = base64.b64decode(proto_b64str)
+    except binascii.Error as e:
+        raise Exception("Not a valid base64-encoded protobuf.")
+    try:
+        pb = proto_simulation.Simulation.FromString(proto_str)
+    except TypeError as e:
+        raise Exception("Not a valid base64-encoded protobuf.")
+    return from_proto(pb)

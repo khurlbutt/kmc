@@ -9,5 +9,8 @@ brew install protobuf
 echo "compiling with protoc compiler..."
 protoc --python_out=./ ./proto/site.proto
 protoc --python_out=./ ./proto/lattice.proto
+protoc --python_out=./ ./proto/simulation.proto
+protoc --python_out=./ ./proto/enabled_collection.proto
+protoc --python_out=./ ./proto/elementary_reaction.proto
 
 echo "Done!"

@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package proto.enabled_collection;
+
+message EnabledCollection {
+  // TODO: This is a stub.
+  // optional int64 stub = 1;
+}

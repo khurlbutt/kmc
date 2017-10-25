@@ -1,7 +1,7 @@
 {% set method %}
 {% set input_title %}
 {% set input_keys %}
-{% set serialized_lattice %}
+{% set serialized %}
 
 <p><b>{{ input_title }}</b></p>
 <form action="{{ request.path }}" method="{{ method }}" enctype="application/x-www-form-urlencoded">
@@ -10,7 +10,7 @@
     <label for="{{ input_key }}"><i>{{ input_key }}</i>:</label>
     <input id="{{ input_key }}" type="text" name="{{ input_key }}">
   {% end %}
-  {% if serialized_lattice %}
-    <input id="serialized_lattice" type="hidden" name="serialized_lattice" value="{{ serialized_lattice }}">
+  {% if serialized %}
+    <input id="serialized" type="hidden" name="serialized" value="{{ serialized }}">
   {% end %}
 </form>

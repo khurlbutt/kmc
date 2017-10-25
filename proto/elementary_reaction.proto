@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package proto.elementary_reaction;
+
+message ElementaryReaction {
+  // TODO: This is a stub.
+  // optional int64 stub = 1;
+}

@@ -48,3 +48,23 @@ class EnabledCollection(object):
             len(self._queue), "es" if len(self._queue) != 1 else "",
             self.peek()
         )
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto(enabled_collection):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto(pb):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def to_proto_b64str(enabled_collection):
+    raise NotImplementedError()
+
+
+# Protocol Buffers (proto or pb) are for the display server.
+def from_proto_b64str(proto_b64str):
+    raise NotImplementedError()

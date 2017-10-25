@@ -77,7 +77,7 @@ def simulation_interactive(num_sites=1):
     simulation.run(interactive=True)
 
 
-def simulate(lattice, stop_step=None):
+def simulate_lattice(lattice, stop_step=None):
     if stop_step is None:
         raise PrintToysError("Need stop step to simulate to.")
     if lattice.sites_per_cell == 1:
