@@ -44,7 +44,7 @@ class Process(object):
     def __repr__(self):
         return "%r" % [
             self.enabled_step,
-            "%.4f" % self.occurence_usec,
+            self.occurence_usec,
             sorted(["@%r%s -> %s" % (site, transition[0], transition[1])
                 for site, transition in self.transition_by_site.items()]),
         ]
