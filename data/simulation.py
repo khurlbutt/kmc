@@ -50,9 +50,21 @@ class Simulation(object):
         self.update_process_queue([], from_scratch=True)
 
     def _initialize_elem_rxns(self):
-        import settings.elem_rxns_configs.v4.toy_A as toy1_config
-        self.ELEM_RXNS = toy1_config.build_rxns_list()
-        # print(self.ELEM_RXNS)
+        # Only for /print-toys/{1}
+        # BELOW ARE TOY CASES... FOR NOW
+        # Move imports to top once done iterating...
+        if self.lattice.sites_per_cell == 1:
+            import settings.elem_rxns_configs.v4.toy_A as toy1_config
+            self.ELEM_RXNS = toy1_config.build_rxns_list()
+        # elif self.lattice.sites_per_cell == 2:
+            # import settings.elem_rxns_configs.v4.CO_oxidation as toy2_config
+            # TODO: Implement justify_elem_rxn_spec, generate_rotated_specs, and
+            #       build_rxns_list functions for generic elem_rxn_configs or
+            #       fixup for latest version of CO_oxidation.
+            # self.ELEM_RXNS = toy2_config.build_rxns_list()
+
+        if not self.ELEM_RXNS:
+            raise NotImplementedError()
 
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
@@ -75,6 +87,8 @@ class Simulation(object):
         # Only for /print-toys/{1, 2}
         # BELOW ARE TOY CASES... FOR NOW
         # Move imports to top once done iterating...
+        site_index = site.coordinates[-1]
+
         after = None
         if self.lattice.sites_per_cell == 1:
             # import settings.elem_rxns_configs.v3.toy_A as toy1_config
@@ -83,7 +97,6 @@ class Simulation(object):
             elif site.state == "*_0":
                 after = "A"
         elif self.lattice.sites_per_cell == 2:
-            site_index = site.coordinates[-1]
             if site_index == 0:
                 if site.state == "*_0":
                     after = "O2"
