@@ -2,7 +2,9 @@ syntax = "proto2";
 
 package proto.enabled_collection;
 
+import "proto/process.proto";
+
 message EnabledCollection {
-  // TODO: This is a stub.
-  // optional int64 stub = 1;
+  // TODO: This is a stub. Likely want these sorted during transmission?
+  // repeated proto.process.Process processes = 1;
 }
