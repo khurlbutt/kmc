@@ -78,6 +78,7 @@ class Simulation(object):
         # Only for /print-toys/{1, 2}
         # BELOW ARE TOY CASES... FOR NOW
         # Move imports to top once done iterating...
+        after = None
         if self.lattice.sites_per_cell == 1:
             # import settings.elem_rxns_configs.v3.toy_A as toy1_config
             if site.state == "A":
@@ -96,8 +97,9 @@ class Simulation(object):
                     after = "CO"
                 elif site.state == "CO":
                     after = "*_1"
-        else:
-            raise NotImplementedError
+
+        if not after:
+            raise NotImplementedError()
         return set([
             data.process.Process(
                 self.step, {site.coordinates: (site.state, after)}),
