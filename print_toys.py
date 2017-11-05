@@ -27,7 +27,7 @@ def lattice_examples():
 def process_examples():
     def __current_sites_states(lattice, process):
         sites = []
-        for site_coordinates in sorted(process.transition_by_site.keys()):
+        for site_coordinates in sorted(process.sites_coordinates()):
             sites.append(lattice[site_coordinates])
         return sites
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
