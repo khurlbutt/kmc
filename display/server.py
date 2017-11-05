@@ -1,4 +1,5 @@
 import data.lattice
+import data.proto_convert
 import print_toys
 import tornado.ioloop
 import tornado.web
@@ -58,6 +59,7 @@ class PrintToySimulation(PrintToyDisplayHandler):
                 num_dummy_sites, e))
 
     def post(self, num_dummy_sites):
+        num_dummy_sites = int(num_dummy_sites)
         lattice = None
         simulation_steps = None
 
@@ -67,7 +69,6 @@ class PrintToySimulation(PrintToyDisplayHandler):
         simulation_steps = int(self.get_body_argument("additional_steps", 0))
 
         if stop_step:
-            num_dummy_sites = int(num_dummy_sites)
             axis_lengths = (10, 10)
             lattice = print_toys.get_dummy_lattice(
                 axis_lengths, num_dummy_sites, empty=True)
@@ -75,8 +76,18 @@ class PrintToySimulation(PrintToyDisplayHandler):
                 lattice=lattice, stop_step=stop_step)
         elif simulation_steps:
             old_serialized_sim = self.get_body_argument("serialized")
-            simulation = data.simulation.from_proto_b64str(old_serialized_sim)
-            simulation.STOP_STEP = simulation.step + simulation_steps
+            simulation = data.proto_convert.Simulation.from_proto_b64str(
+                old_serialized_sim)
+            # TODO: Fix gross hack regarding default for 2x2 toy lattice.
+            if tuple(
+                    simulation.lattice.coordinate_cardinalities[:2]) == (2, 2):
+                axis_lengths = (10, 10)
+                lattice = print_toys.get_dummy_lattice(
+                    axis_lengths, num_dummy_sites, empty=True)
+                simulation = data.simulation.Simulation(
+                    stop_step=simulation_steps, lattice=lattice)
+            else:
+                simulation.STOP_STEP = simulation.step + simulation_steps
         else:
             raise NotImplementedError("Need input.")
 
@@ -90,11 +101,13 @@ class PrintToySimulation(PrintToyDisplayHandler):
 
     def serialize_simulation(self, simulation):
         assert isinstance(simulation, data.simulation.Simulation)
-        return data.simulation.to_proto_b64str(simulation)
+        return data.proto_convert.Simulation.to_proto_b64str(simulation)
 
     def invert_serialized_simulation(self, serialized_simulation):
         assert isinstance(serialized_simulation, str)
-        return data.simulation.from_proto_b64str(serialized_simulation)
+        sim = data.proto_convert.Simulation.from_proto_b64str(
+            serialized_simulation)
+        return sim
 
 
 class PrintToyLattice(PrintToyDisplayHandler):
@@ -140,7 +153,8 @@ class PrintToyLattice(PrintToyDisplayHandler):
                 lattice=lattice, stop_step=stop_step)
         elif simulation_steps:
             serialized_lattice = self.get_body_argument("serialized")
-            lattice = data.lattice.from_proto_b64str(serialized_lattice)
+            lattice = data.proto_convert.Lattice.from_proto_b64str(
+                serialized_lattice)
             lattice = print_toys.simulate_lattice(
                 lattice=lattice, stop_step=simulation_steps)
 
@@ -152,11 +166,11 @@ class PrintToyLattice(PrintToyDisplayHandler):
 
     def serialize_lattice(self, lattice):
         assert isinstance(lattice, data.lattice.Lattice)
-        return data.lattice.to_proto_b64str(lattice)
+        return data.proto_convert.Lattice.to_proto_b64str(lattice)
 
     def invert_serialized_lattice(self, serialized_lattice):
         assert isinstance(serialized_lattice, str)
-        return data.lattice.from_proto_b64str(serialized_lattice)
+        return data.proto_convert.Lattice.from_proto_b64str(serialized_lattice)
 
 
 def main():

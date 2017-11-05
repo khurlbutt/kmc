@@ -1,8 +1,6 @@
-import base64
 import data.cell
 import data.site
 import itertools
-import proto.lattice_pb2 as proto_lattice
 
 
 class Lattice(object):
@@ -106,44 +104,3 @@ class Lattice(object):
         return "(%r){%r unique species: %r}" % (
             "x".join([str(c) for c in self.coordinate_cardinalities]),
             len(species_counts), sorted_distribution)
-
-
-# Protocol Buffers (proto or pb) are for the display server.
-def to_proto(lattice):
-    pb = proto_lattice.Lattice()
-    pb.axis_lengths.extend(list(lattice.coordinate_cardinalities[:-1]))
-    pb.sites_per_cell = lattice.sites_per_cell
-    pb.sites.extend([data.site.to_proto(site) for site in lattice.iter_sites()])
-    return pb
-
-
-# Protocol Buffers (proto or pb) are for the display server.
-def from_proto(pb):
-    lattice = Lattice(axis_lengths=list(pb.axis_lengths),
-        sites_per_cell=pb.sites_per_cell)
-    sites = []
-    for site_pb in pb.sites:
-        sites.append(data.site.from_proto(site_pb))
-    lattice.set_sites(sites)
-    lattice.set_cells()
-    return lattice
-
-
-# Protocol Buffers (proto or pb) are for the display server.
-def to_proto_b64str(lattice):
-    # Serialized bytes as a utf-8 encoded str.
-    return base64.b64encode(to_proto(lattice).SerializeToString())
-
-
-# Protocol Buffers (proto or pb) are for the display server.
-def from_proto_b64str(proto_b64str):
-    try:
-        import binascii
-        proto_str = base64.b64decode(proto_b64str)
-    except binascii.Error as e:
-        raise Exception("Not a valid base64-encoded protobuf.")
-    try:
-        pb = proto_lattice.Lattice.FromString(proto_str)
-    except TypeError as e:
-        raise Exception("Not a valid base64-encoded protobuf.")
-    return from_proto(pb)
