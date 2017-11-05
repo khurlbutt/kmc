@@ -12,5 +12,7 @@ protoc --python_out=./ ./proto/lattice.proto
 protoc --python_out=./ ./proto/simulation.proto
 protoc --python_out=./ ./proto/enabled_collection.proto
 protoc --python_out=./ ./proto/elementary_reaction.proto
+protoc --python_out=./ ./proto/process.proto
+protoc --python_out=./ ./proto/cell.proto
 
 echo "Done!"

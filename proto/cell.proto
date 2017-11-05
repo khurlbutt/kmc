@@ -1,0 +1,8 @@
+syntax = "proto2";
+
+package proto.cell;
+
+message Cell {
+  // TODO: This is a stub.
+  // repeated int32 coordinates = 1;
+}
