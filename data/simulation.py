@@ -15,9 +15,9 @@ class Simulation(object):
             lattice if isinstance(lattice, data.lattice.Lattice) else None)
         self.process_queue = None
         self.ELEM_RXNS = None
-        self._initialize_lattice()
-        self._initialize_process_queue()
-        self._initialize_elem_rxns()
+        self._maybe_initialize_lattice()
+        self._maybe_initialize_process_queue()
+        self._maybe_initialize_elem_rxns()
 
         # Enable processes
         # Draw a process, perform if possible, add new enabled processes.
@@ -31,7 +31,7 @@ class Simulation(object):
                 self.step += 1
                 self.time_usec = int(next_process.occurence_usec)
                 next_process.perform(self.step, self.lattice)
-                self.update_process_queue(next_process.sites_coordinates)
+                self.update_process_queue(next_process.sites_coordinates())
                 if interactive:
                     cin = input(">>>")
                     if cin == "exit":
@@ -40,28 +40,32 @@ class Simulation(object):
                         break
                     print(self)
 
-    def _initialize_lattice(self):
+    def _maybe_initialize_lattice(self):
         if self.lattice is None:
             self.lattice = data.lattice.Lattice()
 
-    def _initialize_process_queue(self):
-        self.process_queue = data.enabled_collection.EnabledCollection(
-            key_fn=data.process.Process.key_fn)
-        self.update_process_queue([], from_scratch=True)
+    def _maybe_initialize_process_queue(self):
+        if self.process_queue is None:
+            self.process_queue = data.enabled_collection.EnabledCollection(
+                sorting_fn=data.process.Process.enabled_collection_sorting_fn)
+            self.update_process_queue([], from_scratch=True)
 
-    def _initialize_elem_rxns(self):
+    def _maybe_initialize_elem_rxns(self):
         # Only for /print-toys/{1}
         # BELOW ARE TOY CASES... FOR NOW
         # Move imports to top once done iterating...
-        if self.lattice.sites_per_cell == 1:
-            import settings.elem_rxns_configs.v4.toy_A as toy1_config
-            self.ELEM_RXNS = toy1_config.build_rxns_list()
-        # elif self.lattice.sites_per_cell == 2:
-            # import settings.elem_rxns_configs.v4.CO_oxidation as toy2_config
-            # TODO: Implement justify_elem_rxn_spec, generate_rotated_specs, and
-            #       build_rxns_list functions for generic elem_rxn_configs or
-            #       fixup for latest version of CO_oxidation.
-            # self.ELEM_RXNS = toy2_config.build_rxns_list()
+        if self.ELEM_RXNS is None:
+            if self.lattice.sites_per_cell == 1:
+                import settings.elem_rxns_configs.v4.toy_A as toy1_config
+                self.ELEM_RXNS = toy1_config.build_rxns_list()
+            # elif self.lattice.sites_per_cell == 2:
+                # import settings.elem_rxns_configs.v4.CO_oxidation \
+                #   as toy2_config
+                # TODO: Implement justify_elem_rxn_spec, generate_rotated_specs,
+                #       and build_rxns_list functions for generic
+                #       elem_rxn_configs or fixup for latest version of
+                #       CO_oxidation.
+                # self.ELEM_RXNS = toy2_config.build_rxns_list()
 
         if not self.ELEM_RXNS:
             raise NotImplementedError()
@@ -75,8 +79,8 @@ class Simulation(object):
                 newly_enabled_processes.update(
                     self._find_enabled_processes(site))
         else:
-            for sites_coordinates in sites_coordinates:
-                site = self.lattice[sites_coordinates]
+            for site_coordinates in sites_coordinates:
+                site = self.lattice[site_coordinates]
                 newly_enabled_processes.update(
                     self._find_enabled_processes(site))
         for process in newly_enabled_processes:

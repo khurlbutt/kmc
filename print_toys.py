@@ -99,8 +99,8 @@ def simulate_lattice(lattice, stop_step=None):
 
 
 def enabled_collection_examples():
-    key_fn = data.process.Process.key_fn
-    ec = data.enabled_collection.EnabledCollection(key_fn=key_fn)
+    sorting_fn = data.process.Process.enabled_collection_sorting_fn
+    ec = data.enabled_collection.EnabledCollection(sorting_fn=sorting_fn)
     for num_sites in range(1, K_MAX_TOY_DUMMY_SITES + 1):
         lattice = _populate_dummy_lattice(num_sites)
         process = None

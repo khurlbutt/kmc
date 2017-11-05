@@ -3,7 +3,7 @@ import sortedcontainers
 
 class EnabledCollection(object):
 
-    def __init__(self, key_fn=None):
+    def __init__(self, sorting_fn=None):
         # Requirements:
         # Add element, log n
         # Pop lowest value by occurence time, log n
@@ -16,8 +16,8 @@ class EnabledCollection(object):
         # http://www.grantjenks.com/docs/sortedcontainers/sortedlistwithkey.html
         # IMHO this will do for early iterating; we could build our own, but
         # honestly this is likely more performant. As a plus, it's pythonic AF.
-        assert callable(key_fn), "Need callable for sorted process queue."
-        self._queue = sortedcontainers.SortedListWithKey(key=key_fn)
+        assert callable(sorting_fn), "Need callable for sorted process queue."
+        self._queue = sortedcontainers.SortedListWithKey(key=sorting_fn)
 
     def add(self, process):
         # Assumes occurence time used as key.

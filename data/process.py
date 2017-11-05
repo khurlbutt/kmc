@@ -10,10 +10,12 @@ class Process(object):
         self.occurence_usec = None
         # Map of 3-tuple (row, col, site_index) to 2-tuple (before, after)
         self.transition_by_site = transition_by_site
-        # Convenience, assumes transition_by_site is immutable.
-        self.sites_coordinates = list(transition_by_site.keys())
 
-    def key_fn(self):
+    # Convenience, assumes transition_by_site is immutable.
+    def sites_coordinates(self):
+        return sorted(list(self.transition_by_site.keys()))
+
+    def enabled_collection_sorting_fn(self):
         # Used by data.enabled_collection.EnabledCollection for sorting.
         if self.occurence_usec is None:
             raise LatticeProcessException("Occurence time never initialized.")
@@ -40,6 +42,10 @@ class Process(object):
             if before_adsorbate != site.state:
                 return False
         return True
+
+    def __hash__(self):
+        # Helps to more efficiently compute data.simulation.update_process_queue
+        return hash(tuple(sorted(self.sites_coordinates())))
 
     def __repr__(self):
         return "%r" % [

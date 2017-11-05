@@ -98,6 +98,8 @@ class Simulation(BaseProto):
         pb.stop_step = simulation.STOP_STEP
         pb.time_usec = simulation.time_usec
         pb.step = simulation.step
+        # TODO: This would allow data.simulation.update_process_queue to be
+        #       called without from_scrath=True.
         # pb.enabled_collection = (
         #     data.enabled_collection.to_proto(simulation.process_queue))
         # pg.elementary_reaction = (
