@@ -39,8 +39,7 @@ class Simulation(object):
                         print("EXITING")
                         break
                     print(self)
-        print("ending simulation run, time %s, step %s" % (
-            self.time_usec, self.step))
+        print("ending simulation run...\n%r" % self)
 
     def _maybe_initialize_lattice(self):
         if self.lattice is None:
@@ -129,5 +128,5 @@ class Simulation(object):
             return self.STOP_STEP > self.step
 
     def __repr__(self):
-        return "s=%d\nt=%d\nLattice:%r\nEnabledCollection:%r" % (
+        return "step=%d\ntime=%d\nLattice:%r\nEnabledCollection:%r" % (
             self.step, self.time_usec, self.lattice, self.process_queue)
