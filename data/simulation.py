@@ -39,6 +39,8 @@ class Simulation(object):
                         print("EXITING")
                         break
                     print(self)
+        print("ending simulation run, time %s, step %s" % (
+            self.time_usec, self.step))
 
     def _maybe_initialize_lattice(self):
         if self.lattice is None:
