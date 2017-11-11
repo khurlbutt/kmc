@@ -72,6 +72,68 @@ carbon_dioxide_adsorption = {
     }
 }
 
+carbon_dioxide_adsorption = {
+    "name": "carbon dioxide adsorption",
+    "rate_constant": 1e-2,
+    "transitions": {
+        [str R1, str P1, int h1, int j1, int s1],
+        [str R2, str P2, int h2, int j2, int s2],
+        eg
+        ["*", "CO", 0, 0, 0]
+    }
+}
+
+"*_br + *_hol -> CO*_br + O*_hol"
+
+carbon_dioxide_adsorption = {
+    "name": "carbon dioxide adsorption",
+    "rate_constant": 1e-2,
+    "transitions": {
+        ["*", "O", 0, 0, 0],
+        ["*", "CO", 1, 1, 1]
+    }
+}
+
+carbon_dioxide_adsorption = {
+    "name": "carbon dioxide adsorption",
+    "rate_constant": 1e-2,
+    "transitions": [
+        ["*", "O", 0, 0, 0],
+        ["*", "CO", 1, 1, 2]
+    ]
+}
+
+
+ELEMENTARY_RXNS = []
+for thing in thingy:
+    ELEMENTARY_RXNS.append(build_elems_for(thing))
+
+def find_processes(self, site):
+    adsorbate = site.occupation
+    processes_to_add = []
+    incident_cell_real_coordinates = site.coordinates #eg (54,93,1)
+    #incident_site_def_coordinates = ... (eg (1,1,1))
+    for elem_rxn in self.ELEMENTARY_RXNS:
+        for possible_launching_point in elem_rxn["transition"]:
+            if adsorbate == possible_launching_point[0]:
+                incident_cell_coordinates = (possible_launching_point[2], possible_launching_point[3])
+                add_flag = True
+                for transition in elem_rxn["transitions"]:
+                    cell_coordinates = (transition[2], transition[3])
+                    
+                    magic_cell_coordinates = incident_cell_real_coordinates + (cell_coordinates - incident_coordinates)
+                    
+                    magic_coordinates = (magic_cell_coordinates[0], magic_cell_coordinates[1], transition[4])
+                    if self.lattice[MAGIC_COORDINATES] != transition[0]:
+                        add_flag = False
+                        break
+                    RETAIN SOME INFORMATION ABOUT MAGIC_COORDINATES FOR PROCESS ADDITION
+                if add_flag:
+                    processes_to_add.append(Process(...))
+    for p in processes_to_add:
+        self.enabled_process.add(p)
+
+
 ELEMENTARY_RXNS = [
     oxygen_adsorption,
     oxygen_desorption,
