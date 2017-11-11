@@ -5,6 +5,8 @@ import itertools
 
 class Lattice(object):
 
+    # Unfortunately messy init vars for now, could fixup after print_toys.py
+    # calms down a bit... massive refactors got cumbersome.
     def __init__(self, *, axis_lengths=None, sites_per_cell=None):
         axis_lengths = tuple(axis_lengths) if axis_lengths else (10, 10)
         sites_per_cell = sites_per_cell or 1
