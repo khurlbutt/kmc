@@ -88,43 +88,60 @@ class Simulation(object):
             self.process_queue.add(process)
 
     def _find_enabled_processes(self, site):
-        # Only for /print-toys/{1, 2}
-        # BELOW ARE TOY CASES... FOR NOW
-        # Move imports to top once done iterating...
-        site_index = site.coordinates[-1]
-
-        after = None
-        if self.lattice.sites_per_cell == 1:
-            # import settings.elem_rxns_configs.v3.toy_A as toy1_config
-            if site.state == "A":
-                after = "*_0"
-            elif site.state == "*_0":
-                after = "A"
-        elif self.lattice.sites_per_cell == 2:
-            if site_index == 0:
-                if site.state == "*_0":
-                    after = "O2"
-                elif site.state == "O2":
-                    after = "*_0"
-            elif site_index == 1:
-                if site.state == "*_1":
-                    after = "CO"
-                elif site.state == "CO":
-                    after = "*_1"
-
-        if not after:
-            raise NotImplementedError()
-        return set([
-            data.process.Process(
-                self.step, {site.coordinates: (site.state, after)}),
-        ])
+        enabled_processes = set()
+        # Iterate over all possible elementary reactions in this simulation.
+        print(self.ELEM_RXNS)
+        for elem_rxn in self.ELEM_RXNS:
+            # Consider every transition for this reaction, and whether the site
+            # could validly play a part.
+            for potential_site_transition in elem_rxn.transitions:
+                cell_offset = [
+                    int(c) for c in potential_site_transition.cell_coordinates
+                ]
+                # Valid transitions have reactant matching the site's adsorbate.
+                if potential_site_transition.reactant == site.state:
+                    # Before we promote reaction to enabled process, must check
+                    # validity of other transitions.
+                    num_valid_transitions = 0
+                    transition_by_site = {}
+                    for inner_transition in elem_rxn.transitions:
+                        # Given outer-loop's site has a known lattice position
+                        # and offset, now find coordinates on lattice for inner.
+                        inner_cell_offset = [
+                            int(c) for c in inner_transition.cell_coordinates
+                        ]
+                        # Vector operation using lists performs a translation,
+                        #   e.g. site at (42, 3) has cell_offset of (1, 0) while
+                        #        inner_transition offset is (1,1)... so (42, 4).
+                        translated_site_coords = []
+                        for i in range(len(site.coordinates) - 1):
+                            translated_site_coords.append(
+                                site.coordinates[i] + (
+                                    inner_cell_offset[i] - cell_offset[i])
+                            )
+                        # Offset doesn't apply, no translatation necessary.
+                        translated_site_coords.append(
+                            inner_transition.site_index)
+                        inner_site_key = tuple(translated_site_coords)
+                        if (inner_transition.reactant ==
+                                self.lattice[inner_site_key].state):
+                            num_valid_transitions += 1
+                            transition_by_site[inner_site_key] = (
+                                inner_transition.reactant,
+                                inner_transition.product,
+                            )
+                    if num_valid_transitions == len(elem_rxn.transitions):
+                        enabled_processes.add(
+                            data.process.Process(self.step, transition_by_site))
+        return enabled_processes
 
     def _continue_sim(self):
         # TODO include more flexibility on stop conditions
-        if self.STOP_TIME > 0:
-            return self.STOP_TIME > self.time_usec
-        else:
-            return self.STOP_STEP > self.step
+        # if self.STOP_TIME > 0:
+        #     return self.STOP_TIME > self.time_usec
+        # else:
+        #     return self.STOP_STEP > self.step
+        return self.STOP_STEP > self.step
 
     def __repr__(self):
         return "step=%d\ntime=%d\nLattice:%r\nEnabledCollection:%r" % (
