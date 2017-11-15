@@ -6,6 +6,15 @@ import data.simulation
 K_MAX_TOY_DUMMY_SITES = 5
 
 
+def simulation_from_scratch(num_dummy_sites, stop_step):
+    axis_lengths = (10, 10)
+    lattice = get_dummy_lattice(
+        axis_lengths, num_dummy_sites, empty=True)
+    simulation = data.simulation.Simulation(
+        lattice=lattice, stop_step=stop_step)
+    return simulation
+
+
 def get_dummy_lattice(axis_lengths, num_dummy_sites, empty=False):
     if num_dummy_sites > K_MAX_TOY_DUMMY_SITES:
         raise PrintToysError("Too many dummy sites, no example defined.")

@@ -60,34 +60,26 @@ class PrintToySimulation(PrintToyDisplayHandler):
 
     def post(self, num_dummy_sites):
         num_dummy_sites = int(num_dummy_sites)
-        lattice = None
-        simulation_steps = None
 
         # From empty.
         stop_step = int(self.get_body_argument("stop_step", 0))
         # From serialized.
-        simulation_steps = int(self.get_body_argument("additional_steps", 0))
+        additional_steps = int(self.get_body_argument("additional_steps", 0))
 
         if stop_step:
-            axis_lengths = (10, 10)
-            lattice = print_toys.get_dummy_lattice(
-                axis_lengths, num_dummy_sites, empty=True)
-            simulation = data.simulation.Simulation(
-                lattice=lattice, stop_step=stop_step)
-        elif simulation_steps:
+            simulation = print_toys.simulation_from_scratch(
+                num_dummy_sites, stop_step)
+        elif additional_steps:
             old_serialized_sim = self.get_body_argument("serialized")
             simulation = data.proto_convert.Simulation.from_proto_b64str(
                 old_serialized_sim)
             # TODO: Fix gross hack regarding default for 2x2 toy lattice.
-            if tuple(
-                    simulation.lattice.coordinate_cardinalities[:2]) == (2, 2):
-                axis_lengths = (10, 10)
-                lattice = print_toys.get_dummy_lattice(
-                    axis_lengths, num_dummy_sites, empty=True)
-                simulation = data.simulation.Simulation(
-                    stop_step=simulation_steps, lattice=lattice)
+            if tuple(simulation.lattice.coordinate_cardinalities[:2]) == (2, 2):
+                simulation = print_toys.simulation_from_scratch(
+                    num_dummy_sites, additional_steps)
             else:
-                simulation.STOP_STEP = simulation.step + simulation_steps
+                simulation.STOP_STEP = simulation.step + additional_steps
+                simulation.update_process_queue(None, from_scratch=True)
         else:
             raise NotImplementedError("Need input.")
 
@@ -101,7 +93,8 @@ class PrintToySimulation(PrintToyDisplayHandler):
 
     def serialize_simulation(self, simulation):
         assert isinstance(simulation, data.simulation.Simulation)
-        return data.proto_convert.Simulation.to_proto_b64str(simulation)
+        serialized = data.proto_convert.Simulation.to_proto_b64str(simulation)
+        return serialized
 
 
 class PrintToyLattice(PrintToyDisplayHandler):
