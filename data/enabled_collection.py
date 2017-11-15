@@ -1,3 +1,4 @@
+import data.process
 import sortedcontainers
 
 
@@ -21,6 +22,7 @@ class EnabledCollection(object):
 
     def add(self, process):
         # Assumes occurence time used as key.
+        assert isinstance(process, data.process.Process)
         self._queue.add(process)
 
     def pop(self, peek_only=False):
