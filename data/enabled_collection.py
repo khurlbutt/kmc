@@ -52,5 +52,4 @@ class EnabledCollection(object):
 
 
 class EnabledCollectionError(IndexError):
-    def __init__(self, e):
-        raise self
+    pass
