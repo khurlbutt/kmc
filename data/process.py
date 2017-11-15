@@ -17,7 +17,7 @@ class Process(object):
     def enabled_collection_sorting_fn(self):
         # Used by data.enabled_collection.EnabledCollection for sorting.
         if self.occurence_usec is None:
-            raise LatticeProcessException("Occurence time never initialized.")
+            raise SimProcessException("Occurence time never initialized.")
         return self.occurence_usec
 
     def sites_coordinates(self):
@@ -30,7 +30,7 @@ class Process(object):
 
     def perform(self, step, lattice):
         if not self.is_still_performable(lattice):
-            raise LatticeProcessException("Not performable")
+            raise SimProcessException("Not performable")
         for site_coordinates, transition in self._transition_by_site.items():
             after_adsorbate = transition[1]
             lattice[site_coordinates].transition(step, after_adsorbate)
@@ -50,13 +50,12 @@ class Process(object):
         return hash(tuple(sorted(self._sites_coordinates)))
 
     def __repr__(self):
-        return "%r" % [
-            self.enabled_step,
-            self.occurence_usec,
-            sorted(["@%r%s -> %s" % (s_coords, transition[0], transition[1])
-                for s_coords, transition in self._transition_by_site.items()]),
-        ]
+        return (
+            "enabled_step=%s,occurence_time=%s,%r" % (self.enabled_step,
+                self.occurence_usec,
+                sorted(["@%r%s -> %s" % (s_coords, transition[0], transition[1])
+                for s_coords, transition in self._transition_by_site.items()])))
 
 
-class LatticeProcessException(Exception):
+class SimProcessException(Exception):
     pass
