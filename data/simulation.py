@@ -16,8 +16,8 @@ class Simulation(object):
         self.process_queue = None
         self.ELEM_RXNS = None
         self._maybe_initialize_lattice()
-        self._maybe_initialize_process_queue()
         self._maybe_initialize_elem_rxns()
+        self._maybe_initialize_process_queue()
 
         # Enable processes
         # Draw a process, perform if possible, add new enabled processes.
@@ -35,7 +35,6 @@ class Simulation(object):
                 if interactive:
                     cin = input(">>>")
                     if cin == "exit":
-                        print(self)
                         print("EXITING")
                         break
                     print(self)
@@ -49,7 +48,7 @@ class Simulation(object):
         if self.process_queue is None:
             self.process_queue = data.enabled_collection.EnabledCollection(
                 sorting_fn=data.process.Process.enabled_collection_sorting_fn)
-            self.update_process_queue([], from_scratch=True)
+            self.update_process_queue(None, from_scratch=True)
 
     def _maybe_initialize_elem_rxns(self):
         # Only for /print-toys/{1}
@@ -69,7 +68,7 @@ class Simulation(object):
                 # self.ELEM_RXNS = toy2_config.build_rxns_list()
 
         if not self.ELEM_RXNS:
-            raise NotImplementedError()
+            raise NotImplementedError("ELEM_RXNS not initialized.")
 
     def update_process_queue(self, sites_coordinates, from_scratch=False):
         newly_enabled_processes = set()
