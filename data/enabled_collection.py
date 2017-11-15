@@ -23,22 +23,23 @@ class EnabledCollection(object):
         # Assumes occurence time used as key.
         self._queue.add(process)
 
-    def pop(self, raise_if_empty=False):
+    def pop(self, peek_only=False):
         try:
             return self._queue.pop(0)
         except IndexError as e:
-            if raise_if_empty:
-                raise e
-            return None
+            if peek_only:
+                return None
+            raise EnabledCollectionError(e)
 
     def clear(self):
         self._queue.clear()
 
     def peek(self):
-        process = self.pop()
+        process = None
+        process = self.pop(peek_only=True)
         if process:
             self.add(process)
-        return process
+        return "%r" % process
 
     def __len__(self):
         return len(self._queue)
@@ -48,3 +49,8 @@ class EnabledCollection(object):
             len(self._queue), "es" if len(self._queue) != 1 else "",
             self.peek()
         )
+
+
+class EnabledCollectionError(IndexError):
+    def __init__(self, e):
+        raise self
