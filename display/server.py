@@ -103,12 +103,6 @@ class PrintToySimulation(PrintToyDisplayHandler):
         assert isinstance(simulation, data.simulation.Simulation)
         return data.proto_convert.Simulation.to_proto_b64str(simulation)
 
-    def invert_serialized_simulation(self, serialized_simulation):
-        assert isinstance(serialized_simulation, str)
-        sim = data.proto_convert.Simulation.from_proto_b64str(
-            serialized_simulation)
-        return sim
-
 
 class PrintToyLattice(PrintToyDisplayHandler):
     def get(self, num_dummy_sites):
@@ -167,10 +161,6 @@ class PrintToyLattice(PrintToyDisplayHandler):
     def serialize_lattice(self, lattice):
         assert isinstance(lattice, data.lattice.Lattice)
         return data.proto_convert.Lattice.to_proto_b64str(lattice)
-
-    def invert_serialized_lattice(self, serialized_lattice):
-        assert isinstance(serialized_lattice, str)
-        return data.proto_convert.Lattice.from_proto_b64str(serialized_lattice)
 
 
 def main():
