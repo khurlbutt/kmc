@@ -114,8 +114,9 @@ class Simulation(BaseProto):
         simulation.time_usec = pb.time_usec
         simulation.step = pb.step
         simulation.lattice = data.proto_convert.Lattice.from_proto(pb.lattice)
-        simulation.enabled_collection = pb.process_queue
-        simulation.ELEM_RXNS = pb.elem_rxns
+        # TODO: No huge rush here b/c can start from scratch.
+        # simulation.enabled_collection = pb.process_queue
+        # simulation.ELEM_RXNS = pb.elem_rxns
         return simulation
 
     def to_proto_b64str(simulation):
