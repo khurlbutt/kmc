@@ -3,6 +3,11 @@ syntax = "proto2";
 package proto.elementary_reaction;
 
 message ElementaryReaction {
-  // TODO: This is a stub.
-  // optional int64 stub = 1;
+  message Transition {
+    optional string reactant = 1;
+    optional string product = 2;
+    repeated int32 cell_coordinates = 3;
+    optional int32 site_index = 4;
+  }
+  repeated Transition transitions = 1;
 }
