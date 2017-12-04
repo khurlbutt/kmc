@@ -51,21 +51,20 @@ class Simulation(object):
             self.update_process_queue(None, from_scratch=True)
 
     def _maybe_initialize_elem_rxns(self):
-        # Only for /print-toys/{1}
+        # Only for /print-toys/{1, 2, 3}
         # BELOW ARE TOY CASES... FOR NOW
         # Move imports to top once done iterating...
         if self.ELEM_RXNS is None:
             if self.lattice.sites_per_cell == 1:
-                import settings.elem_rxns_configs.v4.toy_A as toy1_config
+                import settings.elem_rxns_configs.v5.toy_A as toy1_config
                 self.ELEM_RXNS = toy1_config.build_rxns_list()
-            # elif self.lattice.sites_per_cell == 2:
-                # import settings.elem_rxns_configs.v4.CO_oxidation \
-                #   as toy2_config
-                # TODO: Implement justify_elem_rxn_spec, generate_rotated_specs,
-                #       and build_rxns_list functions for generic
-                #       elem_rxn_configs or fixup for latest version of
-                #       CO_oxidation.
-                # self.ELEM_RXNS = toy2_config.build_rxns_list()
+            elif self.lattice.sites_per_cell == 2:
+                import settings.elem_rxns_configs.v5.XY_oxidation as toy2_config
+                self.ELEM_RXNS = toy2_config.build_rxns_list()
+            elif self.lattice.sites_per_cell == 3:
+                import settings.elem_rxns_configs.v5.CO_oxidation as toy3_config
+                self.ELEM_RXNS = toy3_config.build_rxns_list()
+            # TODO: moar dummies n toys... yippee
 
         if not self.ELEM_RXNS:
             raise NotImplementedError("ELEM_RXNS not initialized.")
@@ -90,7 +89,6 @@ class Simulation(object):
     def _find_enabled_processes(self, site):
         enabled_processes = set()
         # Iterate over all possible elementary reactions in this simulation.
-        print(self.ELEM_RXNS)
         for elem_rxn in self.ELEM_RXNS:
             # Consider every transition for this reaction, and whether the site
             # could validly play a part.

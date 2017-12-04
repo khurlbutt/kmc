@@ -79,12 +79,13 @@ class PrintToySimulation(PrintToyDisplayHandler):
                     num_dummy_sites, additional_steps)
             else:
                 simulation.STOP_STEP = simulation.step + additional_steps
+                # TODO: Once storing process queue (enabled_collection) on the
+                # client proto, consider preserving -- not naively from scratch.
                 simulation.update_process_queue(None, from_scratch=True)
         else:
             raise NotImplementedError("Need input.")
 
         simulation.run()
-
         new_serialized_sim = self.serialize_simulation(simulation)
         self.render("print_toys/toy_simulation.html",
             sim=simulation,

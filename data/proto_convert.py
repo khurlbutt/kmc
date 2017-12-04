@@ -107,13 +107,13 @@ class Simulation(BaseProto):
         return pb
 
     def from_proto(pb):
+        lattice = data.proto_convert.Lattice.from_proto(pb.lattice)
         simulation = data.simulation.Simulation(stop_step=pb.stop_step,
-            lattice=pb.lattice)
+            lattice=lattice)
         simulation.STOP_TIME = pb.stop_time
         simulation.STOP_STEP = pb.stop_step
         simulation.time_usec = pb.time_usec
         simulation.step = pb.step
-        simulation.lattice = data.proto_convert.Lattice.from_proto(pb.lattice)
         # TODO: No huge rush here b/c can start from scratch.
         # simulation.enabled_collection = pb.process_queue
         # simulation.ELEM_RXNS = pb.elem_rxns
