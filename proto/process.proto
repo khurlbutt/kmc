@@ -5,6 +5,9 @@ package proto.process;
 import "proto/elementary_reaction.proto";
 
 message Process {
-  // TODO: This is a stub.
-  // repeated proto.elementary_reaction.ElementaryReaction elem_rnxs = 1;
+    optional int64 enabled_step = 1;
+    optional int64 occurence_usec = 2;
+    // Maybe use a float or message? Ask Hurlbutt how complicated they may get.
+    optional int64 rate_constant = 3;
+    optional proto.elementary_reaction.ElementaryReaction elem_rxn = 4;
 }

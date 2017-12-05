@@ -10,7 +10,7 @@ import data.lattice
 import data.simulation
 import data.site
 # import proto.cell_pb2
-# import proto.elementary_reaction_pb2
+import proto.elementary_reaction_pb2
 # import proto.enabled_collection_pb2
 import proto.lattice_pb2
 import proto.simulation_pb2
@@ -86,7 +86,54 @@ class Lattice(BaseProto):
 
 
 class Process(BaseProto):
-    pass
+
+    def to_proto(process):
+        pb = proto.process_pb2.Process()
+        pb.enabled_step = process.enabled_step or 0
+        pb.occurence_usec = process.occurence_usec
+        pb.rate_constant = process.rate_constant
+        elem_rxn = proto.elementary_reaction_pb2.ElementaryReaction()
+        elem_rxn.rate_constant = process.rate_constant
+        for site_coords, transition in process._transition_by_site.items():
+            reactant, product = transition[:]
+            elem_rxn.transitions.add(
+                reactant=reactant,
+                product=product,
+                cell_coordinates=site_coords[:-1],
+                site_index=site_coords[-1])
+        pb.elem_rxn.CopyFrom(elem_rxn)
+        return pb
+
+    def from_proto(pb):
+        transition_by_site = {}
+        for transition in pb.elem_rxn.transitions:
+            key = tuple(
+                transition.cell_coordinates[:] + [transition.site_index])
+            transition_by_site[key] = (
+                [transition.reactant, transition.product])
+        process = data.process.Process(
+            pb.enabled_step,
+            transition_by_site,
+            occurence_usec=pb.occurence_usec or None,
+            rate_constant=pb.rate_constant or None)
+        return process
+
+    def to_proto_b64str(process):
+        # Serialized bytes as a utf-8 encoded str.
+        pb = data.proto_convert.Process.to_proto(process)
+        return base64.b64encode(pb.SerializeToString())
+
+    def from_proto_b64str(proto_b64str):
+        try:
+            import binascii
+            proto_str = base64.b64decode(proto_b64str)
+        except binascii.Error as e:
+            raise Exception("Not a valid base64-encoded protobuf.")
+        try:
+            pb = proto.process_pb2.Process.FromString(proto_str)
+        except TypeError as e:
+            raise Exception("Not a valid base64-encoded protobuf.")
+        return data.proto_convert.Process.from_proto(pb)
 
 
 class Simulation(BaseProto):

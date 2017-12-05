@@ -130,7 +130,8 @@ class Simulation(object):
                             )
                     if num_valid_transitions == len(elem_rxn.transitions):
                         enabled_processes.add(
-                            data.process.Process(self.step, transition_by_site))
+                            data.process.Process(self.step, transition_by_site,
+                                rate_constant=elem_rxn.rate_constant))
         return enabled_processes
 
     def _continue_sim(self):

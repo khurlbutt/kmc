@@ -12,6 +12,11 @@ def build_rxns_list():
         proto.elementary_reaction_pb2.ElementaryReaction.Transition(
             reactant="A", product="*_0", cell_coordinates=[0, 0], site_index=0)
     ])
+
+    # Dull rate constants.
+    adsorption.rate_constant = 1
+    desorption.rate_constant = 1
+
     return [
         adsorption,
         desorption

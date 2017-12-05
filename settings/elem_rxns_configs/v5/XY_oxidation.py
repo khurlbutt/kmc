@@ -30,6 +30,16 @@ def build_rxns_list():
             reactant="Y", product="*_1", cell_coordinates=[0, 0], site_index=1)
     ])
 
+    # X is slightly more likely than Y
+    k_X = 3
+    k_Y = 2
+
+    X_adsorption.rate_constant = k_X
+    X_desorption.rate_constant = k_X
+
+    Y_adsorption.rate_constant = k_Y
+    Y_desorption.rate_constant = k_Y
+
     return [
 
         # O

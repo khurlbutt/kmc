@@ -10,4 +10,5 @@ message ElementaryReaction {
     optional int32 site_index = 4;
   }
   repeated Transition transitions = 1;
+  optional int64 rate_constant = 2;
 }

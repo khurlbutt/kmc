@@ -80,8 +80,24 @@ def build_rxns_list():
             reactant="CO", product="*_2", cell_coordinates=[1, 1], site_index=2)
     ])
 
-    return [
+    # Oxygen rate constant
+    k_O = 1e5
+    oxygen_adsorption.rate_constant = k_O
+    oxygen_desorption.rate_constant = k_O
 
+    # Carbon monooxide rate constant
+    k_CO = 2e4
+    carbon_monoxide_adsorption.rate_constant = k_CO
+    carbon_monoxide_adsorption.rate_constant = k_CO
+
+    # Carbon dioxide rate constant
+    k_CO2 = 1e4
+    carbon_dioxide_adsorption_a.rate_constant = k_CO2
+    carbon_dioxide_adsorption_b.rate_constant = k_CO2
+    carbon_dioxide_formation_a.rate_constant = k_CO2
+    carbon_dioxide_formation_b.rate_constant = k_CO2
+
+    return [
         # O
         oxygen_adsorption,
         oxygen_desorption,

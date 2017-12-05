@@ -2,12 +2,14 @@
 
 class Process(object):
 
-    def __init__(self, enabled_step, transition_by_site):
+    def __init__(self, enabled_step, transition_by_site,
+            occurence_usec=None, rate_constant=None):
         assert isinstance(enabled_step, int)
         assert isinstance(transition_by_site, dict) and transition_by_site
 
-        self.enabled_step = enabled_step
-        self.occurence_usec = None
+        self.enabled_step = enabled_step or 0
+        self.occurence_usec = occurence_usec or None
+        self.rate_constant = rate_constant or None
 
         self._sites_coordinates = frozenset(transition_by_site.keys())
         # Should treat as immutable!
@@ -23,10 +25,15 @@ class Process(object):
     def sites_coordinates(self):
         return sorted(self._sites_coordinates)
 
-    def generate_occurence_usec(self, current_usec):
-        # TODO...
+    def generate_occurence_usec(self, current_usec, rate_constant=None):
         import random
-        self.occurence_usec = current_usec + int((random.random() * 1e6))
+        if rate_constant is not None:
+            print("Would use %r as rate constant." % rate_constant)
+            import math
+            self.occurence_usec = (
+                1 / 1 + math.exp(random.random() ** rate_constant))
+        else:
+            self.occurence_usec = current_usec + int((random.random() * 1e6))
 
     def perform(self, step, lattice):
         if not self.is_still_performable(lattice):
@@ -53,6 +60,7 @@ class Process(object):
         return (
             "enabled_step=%s,occurence_time=%s,%r" % (self.enabled_step,
                 self.occurence_usec,
+                # TODO nit: rate_constant
                 sorted(["@%r%s -> %s" % (s_coords, transition[0], transition[1])
                 for s_coords, transition in self._transition_by_site.items()])))
 
